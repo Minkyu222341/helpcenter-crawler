@@ -1,0 +1,20 @@
+spring:
+  profiles:
+    include: secret
+
+crawler:
+  chrome-driver:
+    path: src/main/resources/chromedriver/chromedriver.exe
+  sites:
+    gne:
+      name: 경상남도교육청 헬프센터
+      login-url: https://service.gne.go.kr/helpcenter/main.do
+      target-url: https://service.gne.go.kr/helpcenter/na/ntt/selectNttList.do?mi=7849&bbsId=2265
+      username: ${GNE_USERNAME}
+      password: ${GNE_PASSWORD}
+    changwon:
+      name: 창원대학교 헬프센터
+      login-url: https://www.changwon.ac.kr/helpcenter/lo/login/login.do
+      target-url: https://www.changwon.ac.kr/helpcenter/na/ntt/selectNttList.do?mi=13160&bbsId=3308
+      username: ${CHANGWON_USERNAME}
+      password: ${CHANGWON_PASSWORD}
