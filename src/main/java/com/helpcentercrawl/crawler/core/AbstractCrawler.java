@@ -111,7 +111,7 @@ public abstract class AbstractCrawler implements SiteCrawler {
 
     private static ChromeOptions getOptions() {
         ChromeOptions options = new ChromeOptions();
-//        options.addArguments("--headless"); // Docker에서 실행 시 필요
+        options.addArguments("--headless"); // Docker에서 실행 시 필요
         options.addArguments("--no-sandbox"); // Docker에서 필요
         options.addArguments("--disable-dev-shm-usage"); // Docker에서 필요
 
