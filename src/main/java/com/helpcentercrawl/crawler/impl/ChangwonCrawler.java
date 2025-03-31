@@ -47,6 +47,6 @@ public class ChangwonCrawler extends AbstractCrawler {
     @Override
     protected void processPageData() {
         // 단일 페이지 처리 공통 메서드 호출
-        processSinglePage("table#nttTable > tbody > tr");
+        processMultiplePages("table#nttTable > tbody > tr");
     }
 }

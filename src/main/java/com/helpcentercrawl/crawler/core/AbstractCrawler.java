@@ -36,6 +36,7 @@ public abstract class AbstractCrawler implements SiteCrawler {
     private static final String LOCAL_CHROME_DRIVER_PATH = "src/main/resources/chromedriver/windows/chromedriver.exe";
     private static final String PROC_CHROME_DRIVER_PATH = "/usr/bin/chromedriver";
     private static final String SET_PROPERTY = "webdriver.chrome.driver";
+    private static final String PAGINATION_SELECTOR = ".pagination li a";
 
     /**
      * 템플릿 메서드 - 크롤링 전체 프로세스를 정의합니다.
@@ -110,7 +111,7 @@ public abstract class AbstractCrawler implements SiteCrawler {
 
     private static ChromeOptions getOptions() {
         ChromeOptions options = new ChromeOptions();
-        options.addArguments("--headless"); // Docker에서 실행 시 필요
+//        options.addArguments("--headless"); // Docker에서 실행 시 필요
         options.addArguments("--no-sandbox"); // Docker에서 필요
         options.addArguments("--disable-dev-shm-usage"); // Docker에서 필요
 
@@ -153,16 +154,14 @@ public abstract class AbstractCrawler implements SiteCrawler {
     /**
      * 여러 페이지의 데이터를 처리하는 공통 메서드
      *
-     * @param tableSelector      테이블 행 선택자
-     * @param paginationSelector 페이지네이션 선택자
-     * @param maxPageToCheck     확인할 최대 페이지 수
+     * @param tableSelector 테이블 행 선택자
      */
-    protected void processMultiplePages(String tableSelector, String paginationSelector, int maxPageToCheck) {
+    protected void processMultiplePages(String tableSelector) {
         // 페이지네이션 탐색
-        int maxPages = getMaxPagesCount(paginationSelector);
+        int maxPages = getMaxPagesCount();
 
-        // 각 페이지 탐색
-        for (int currentPage = 1; currentPage <= Math.min(maxPages, maxPageToCheck); currentPage++) {
+        // 각 페이지 탐색 현재 5페이지까지만 탐색
+        for (int currentPage = 1; currentPage <= Math.min(maxPages, 5); currentPage++) {
             if (currentPage > 1) {
                 navigateToPage(currentPage);
             }
@@ -175,11 +174,11 @@ public abstract class AbstractCrawler implements SiteCrawler {
     /**
      * 페이지 수 확인 공통 메서드
      */
-    protected int getMaxPagesCount(String paginationSelector) {
+    protected int getMaxPagesCount() {
         int maxPages = 1;
         try {
             // 페이지네이션 요소 찾기
-            List<WebElement> pagination = driver.findElements(By.cssSelector(paginationSelector));
+            List<WebElement> pagination = driver.findElements(By.cssSelector(PAGINATION_SELECTOR));
 
             // 페이지 수 파악 (마지막 페이지 번호 찾기)
             for (WebElement pageLink : pagination) {
