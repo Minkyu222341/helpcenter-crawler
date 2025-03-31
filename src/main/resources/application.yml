@@ -4,7 +4,7 @@ spring:
 
 crawler:
   chrome-driver:
-    path: src/main/resources/chromedriver/chromedriver.exe
+    path: /usr/local/bin/chromedriver
   sites:
     gne:
       name: 경상남도교육청 헬프센터

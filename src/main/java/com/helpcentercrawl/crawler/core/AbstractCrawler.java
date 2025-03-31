@@ -1,5 +1,6 @@
 package com.helpcentercrawl.crawler.core;
 
+import com.helpcentercrawl.config.CrawlerValueSettings;
 import com.helpcentercrawl.crawler.domain.SiteCrawler;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,6 +25,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 @RequiredArgsConstructor
 public abstract class AbstractCrawler implements SiteCrawler {
 
+    protected final CrawlerValueSettings valueSettings;
     protected WebDriver driver;
     protected WebDriverWait wait;
     protected LocalDate today;
@@ -31,13 +33,25 @@ public abstract class AbstractCrawler implements SiteCrawler {
     protected AtomicInteger todayCompleted = new AtomicInteger(0);
     protected AtomicInteger todayNotCompleted = new AtomicInteger(0);
 
+    private static final String LOCAL_CHROME_DRIVER_PATH = "src/main/resources/chromedriver/windows/chromedriver.exe";
+    private static final String PROC_CHROME_DRIVER_PATH = "/usr/bin/chromedriver";
+    private static final String SET_PROPERTY = "webdriver.chrome.driver";
+
     /**
      * 템플릿 메서드 - 크롤링 전체 프로세스를 정의합니다.
      */
     @Override
     public final void crawl() {
-        // 크롬 드라이버 경로 설정
-        System.setProperty("webdriver.chrome.driver", "src/main/resources/chromedriver/chromedriver.exe");
+        // 운영체제에 따라 자동으로 경로 설정
+        if (System.getProperty("os.name").toLowerCase().contains("win")) {
+            // Windows 환경
+            System.setProperty(SET_PROPERTY, LOCAL_CHROME_DRIVER_PATH);
+            log.info("Windows 환경에서 실행 중: {}", LOCAL_CHROME_DRIVER_PATH);
+        } else {
+            // Linux, Mac 등 기타 환경
+            System.setProperty(SET_PROPERTY, PROC_CHROME_DRIVER_PATH);
+            log.info("Linux/Mac 환경에서 실행 중: {}", PROC_CHROME_DRIVER_PATH);
+        }
 
         try {
             // 1. 웹드라이버 초기화
@@ -80,14 +94,7 @@ public abstract class AbstractCrawler implements SiteCrawler {
      * 크롬 옵션 설정 메서드
      */
     protected ChromeOptions getChromeOptions() {
-        ChromeOptions options = new ChromeOptions();
-        options.addArguments("--disable-gpu");
-        options.addArguments("--window-size=1920,1080");
-        options.addArguments("--no-sandbox");
-        options.addArguments("--disable-dev-shm-usage");
-        options.addArguments("--disable-extensions");
-        options.addArguments("--disable-infobars");
-        options.addArguments("--blink-settings=imagesEnabled=false");
+        ChromeOptions options = getOptions();
 
         // 페이지 로드 전략 설정
         options.setPageLoadStrategy(PageLoadStrategy.EAGER);
@@ -98,6 +105,20 @@ public abstract class AbstractCrawler implements SiteCrawler {
         prefs.put("profile.default_content_setting_values.images", 2);
         options.setExperimentalOption("prefs", prefs);
 
+        return options;
+    }
+
+    private static ChromeOptions getOptions() {
+        ChromeOptions options = new ChromeOptions();
+        options.addArguments("--headless"); // Docker에서 실행 시 필요
+        options.addArguments("--no-sandbox"); // Docker에서 필요
+        options.addArguments("--disable-dev-shm-usage"); // Docker에서 필요
+
+        options.addArguments("--disable-gpu");
+        options.addArguments("--window-size=1920,1080");
+        options.addArguments("--disable-extensions");
+        options.addArguments("--disable-infobars");
+        options.addArguments("--blink-settings=imagesEnabled=false");
         return options;
     }
 
@@ -118,6 +139,7 @@ public abstract class AbstractCrawler implements SiteCrawler {
 
     /**
      * 단일 페이지의 데이터 처리를 위한 공통 메서드
+     *
      * @param selector 테이블 행을 선택하기 위한 CSS 선택자
      */
     protected void processSinglePage(String selector) {
@@ -130,11 +152,12 @@ public abstract class AbstractCrawler implements SiteCrawler {
 
     /**
      * 여러 페이지의 데이터를 처리하는 공통 메서드
-     * @param tableSelector 테이블 행 선택자
+     *
+     * @param tableSelector      테이블 행 선택자
      * @param paginationSelector 페이지네이션 선택자
-     * @param maxPageToCheck 확인할 최대 페이지 수
+     * @param maxPageToCheck     확인할 최대 페이지 수
      */
-    protected void processMultiplePages(String tableSelector, String paginationSelector, int maxPageToCheck){
+    protected void processMultiplePages(String tableSelector, String paginationSelector, int maxPageToCheck) {
         // 페이지네이션 탐색
         int maxPages = getMaxPagesCount(paginationSelector);
 
@@ -228,6 +251,7 @@ public abstract class AbstractCrawler implements SiteCrawler {
 
     /**
      * 테이블 행을 처리하는 공통 메서드
+     *
      * @param rows 처리할 웹 요소(행) 목록
      */
     protected void processRows(List<WebElement> rows) {
