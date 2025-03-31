@@ -2,7 +2,6 @@ package com.helpcentercrawl.crawler.impl;
 
 import com.helpcentercrawl.config.CrawlerValueSettings;
 import com.helpcentercrawl.crawler.core.AbstractCrawler;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
@@ -15,10 +14,12 @@ import java.time.Duration;
 
 @Slf4j
 @Component
-@RequiredArgsConstructor
 public class GneCrawler extends AbstractCrawler {
 
-    private final CrawlerValueSettings valueSettings;
+
+    public GneCrawler(CrawlerValueSettings valueSettings) {
+        super(valueSettings);
+    }
 
     @Override
     public String getSiteName() {

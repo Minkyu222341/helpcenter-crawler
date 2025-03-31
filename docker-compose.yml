@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    container_name: helpcenter-crawler
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod,secret
+      - GNE_USERNAME=${GNE_USERNAME}
+      - GNE_PASSWORD=${GNE_PASSWORD}
+      - CHANGWON_USERNAME=${CHANGWON_USERNAME}
+      - CHANGWON_PASSWORD=${CHANGWON_PASSWORD}
+    volumes:
+      - ./src/main/resources/application-secret.yml:/app/src/main/resources/application-secret.yml
+#    restart: unless-stopped
+    restart: no
