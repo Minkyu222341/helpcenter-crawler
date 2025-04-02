@@ -42,4 +42,23 @@ public class CrawlerValueSettings {
 
     @Value("${crawler.sites.changwon.password}")
     private String changwonPassword;
+
+    // 부산교육청-학교 사이트 설정
+    @Value("${crawler.sites.busan-school.name}")
+    private String busanSchoolName;
+
+    @Value("${crawler.sites.busan-school.login-url}")
+    private String busanSchoolLoginUrl;
+
+    @Value("${crawler.sites.busan-school.school-target-url}")
+    private String busanSchoolSchoolTargetUrl;
+
+    @Value("${crawler.sites.busan-school.kindergarten-target-url}")
+    private String busanSchoolKindergartenTargetUrl;
+
+    @Value("${crawler.sites.busan-school.username}")
+    private String busanSchoolUsername;
+
+    @Value("${crawler.sites.busan-school.password}")
+    private String busanSchoolPassword;
 }

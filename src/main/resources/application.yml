@@ -18,3 +18,10 @@ crawler:
       target-url: https://www.changwon.ac.kr/helpcenter/na/ntt/selectNttList.do?mi=13160&bbsId=3308
       username: ${CHANGWON_USERNAME}
       password: ${CHANGWON_PASSWORD}
+    busan-school:
+      name: 부산교육청-학교 헬프센터
+      login-url: https://school.busanedu.net/help/lo/login/loginPage.do
+      school-target-url: https://school.busanedu.net/help/na/ntt/selectNttList.do?mi=2344&bbsId=5048088
+      kindergarten-target-url: https://school.busanedu.net/help/na/ntt/selectNttList.do?mi=1854&bbsId=3000410
+      username: ${BUSAN_SCHOOL_USERNAME}
+      password: ${BUSAN_SCHOOL_PASSWORD}

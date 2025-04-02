@@ -96,6 +96,6 @@ public class GneCrawler extends AbstractCrawler {
     @Override
     protected void processPageData() {
         // 여러 페이지 처리 공통 메서드 호출 (최대 5페이지)
-        processMultiplePages("table tbody tr", ".pagination li a", 5);
+        processMultiplePages("table tbody tr");
     }
 }
