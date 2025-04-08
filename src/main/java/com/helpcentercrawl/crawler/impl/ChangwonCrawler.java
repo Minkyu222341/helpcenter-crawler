@@ -2,6 +2,7 @@ package com.helpcentercrawl.crawler.impl;
 
 import com.helpcentercrawl.config.CrawlerValueSettings;
 import com.helpcentercrawl.crawler.core.AbstractCrawler;
+import com.helpcentercrawl.service.CrawlResultService;
 import lombok.extern.slf4j.Slf4j;
 import org.openqa.selenium.By;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -12,13 +13,18 @@ import org.springframework.stereotype.Component;
 public class ChangwonCrawler extends AbstractCrawler {
 
 
-    public ChangwonCrawler(CrawlerValueSettings valueSettings) {
-        super(valueSettings);
+    public ChangwonCrawler(CrawlResultService crawlResultService, CrawlerValueSettings valueSettings) {
+        super(crawlResultService, valueSettings);
     }
 
     @Override
     public String getSiteName() {
         return valueSettings.getChangwonName();
+    }
+
+    @Override
+    public String getSiteCode() {
+        return valueSettings.getChangwonCode();
     }
 
     @Override

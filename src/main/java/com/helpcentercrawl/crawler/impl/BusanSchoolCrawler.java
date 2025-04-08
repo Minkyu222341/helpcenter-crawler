@@ -2,6 +2,7 @@ package com.helpcentercrawl.crawler.impl;
 
 import com.helpcentercrawl.config.CrawlerValueSettings;
 import com.helpcentercrawl.crawler.core.AbstractCrawler;
+import com.helpcentercrawl.service.CrawlResultService;
 import lombok.extern.slf4j.Slf4j;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
@@ -14,13 +15,19 @@ import java.util.List;
 @Component
 public class BusanSchoolCrawler extends AbstractCrawler {
 
-    public BusanSchoolCrawler(CrawlerValueSettings valueSettings) {
-        super(valueSettings);
+
+    public BusanSchoolCrawler(CrawlResultService crawlResultService, CrawlerValueSettings valueSettings) {
+        super(crawlResultService, valueSettings);
     }
 
     @Override
     public String getSiteName() {
         return valueSettings.getBusanSchoolName();
+    }
+
+    @Override
+    public String getSiteCode() {
+        return valueSettings.getBusanSchoolCode();
     }
 
     @Override

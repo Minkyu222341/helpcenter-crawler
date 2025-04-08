@@ -18,24 +18,30 @@ public class CrawlResult extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Comment("사이트 Idx")
-    private Long siteIdx;
+    @Comment("사이트 코드")
+    private String siteCode;
     @Comment("완료된 요청 개수")
     private Integer completedCount;
     @Comment("미완료된 요청 개수")
     private Integer notCompletedCount;
     @Comment("총 요청 개수")
     private Integer totalCount;
-    @Comment("요청사항 평균 처리 시간(분)")
-    private Long averageProcessingTimeMinutes;
 
     @Builder
-    public CrawlResult(Long id, Long siteIdx, Integer completedCount, Integer notCompletedCount, Integer totalCount, Long averageProcessingTimeMinutes) {
+    public CrawlResult(Long id, String siteCode, Integer completedCount, Integer notCompletedCount, Integer totalCount) {
         this.id = id;
-        this.siteIdx = siteIdx;
+        this.siteCode = siteCode;
         this.completedCount = completedCount;
         this.notCompletedCount = notCompletedCount;
         this.totalCount = totalCount;
-        this.averageProcessingTimeMinutes = averageProcessingTimeMinutes;
+    }
+
+    /**
+     * 크롤링 결과 카운트 업데이트
+     */
+    public void updateCounts(Integer completedCount, Integer notCompletedCount, Integer totalCount) {
+        this.completedCount = completedCount;
+        this.notCompletedCount = notCompletedCount;
+        this.totalCount = totalCount;
     }
 }

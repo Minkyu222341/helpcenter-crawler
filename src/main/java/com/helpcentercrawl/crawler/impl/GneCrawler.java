@@ -2,6 +2,7 @@ package com.helpcentercrawl.crawler.impl;
 
 import com.helpcentercrawl.config.CrawlerValueSettings;
 import com.helpcentercrawl.crawler.core.AbstractCrawler;
+import com.helpcentercrawl.service.CrawlResultService;
 import lombok.extern.slf4j.Slf4j;
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
@@ -17,13 +18,18 @@ import java.time.Duration;
 public class GneCrawler extends AbstractCrawler {
 
 
-    public GneCrawler(CrawlerValueSettings valueSettings) {
-        super(valueSettings);
+    public GneCrawler(CrawlResultService crawlResultService, CrawlerValueSettings valueSettings) {
+        super(crawlResultService, valueSettings);
     }
 
     @Override
     public String getSiteName() {
         return valueSettings.getGneName();
+    }
+
+    @Override
+    public String getSiteCode() {
+        return valueSettings.getGneCode();
     }
 
     @Override
