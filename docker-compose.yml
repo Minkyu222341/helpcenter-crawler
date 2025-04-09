@@ -23,7 +23,7 @@ services:
       - ./src/main/resources/application-secret.yml:/app/src/main/resources/application-secret.yml
     restart: no
     depends_on:
-      - redis
+      - redis-main
 
   redis-main:
     image: redis:latest
