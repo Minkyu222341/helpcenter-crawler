@@ -11,7 +11,7 @@ spring:
   # Redis 설정 추가
   data:
     redis:
-      host: localhost
+      host: help-center-redis-main
       port: 6379
       timeout: 10000
       database: 0

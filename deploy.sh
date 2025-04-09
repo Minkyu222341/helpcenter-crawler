@@ -4,7 +4,7 @@
 chmod +x "$0"
 
 echo "애플리케이션 빌드 시작..."
-./gradlew clean bootJar
+./gradlew clean bootJar -Dorg.gradle.java.home="C:/Program Files/Java/jdk-17"
 
 echo "Docker 컨테이너 중지 및 삭제..."
 docker compose down

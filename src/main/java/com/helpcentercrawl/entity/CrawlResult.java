@@ -36,12 +36,5 @@ public class CrawlResult extends BaseEntity {
         this.totalCount = totalCount;
     }
 
-    /**
-     * 크롤링 결과 카운트 업데이트
-     */
-    public void updateCounts(Integer completedCount, Integer notCompletedCount, Integer totalCount) {
-        this.completedCount = completedCount;
-        this.notCompletedCount = notCompletedCount;
-        this.totalCount = totalCount;
-    }
+
 }

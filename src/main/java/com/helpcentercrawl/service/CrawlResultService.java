@@ -32,6 +32,12 @@ public class CrawlResultService {
      * 특정 사이트와 날짜에 해당하는 크롤링 결과 조회
      */
     public CrawlResultDto getCrawlResult(String siteCode, LocalDate date) {
-        return crawlResultRedisRepository.getCrawlResult(siteCode, date);
+        try {
+            return crawlResultRedisRepository.getCrawlResult(siteCode, date);
+        }catch (Exception e) {
+            log.error("Redis에서 크롤링 결과 조회 중 오류 발생: {}", e.getMessage(), e);
+            throw e;
+        }
+
     }
 }

@@ -25,9 +25,9 @@ services:
     depends_on:
       - redis
 
-  redis:
+  help-center-redis-main:
     image: redis:latest
-    container_name: helpcenter-redis
+    container_name: help-center-redis-main
     ports:
       - "6379:6379"
     restart: no
