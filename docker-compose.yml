@@ -17,7 +17,7 @@ services:
       - BUSAN_SCHOOL_USERNAME=${BUSAN_SCHOOL_USERNAME}
       - BUSAN_SCHOOL_PASSWORD=${BUSAN_SCHOOL_PASSWORD}
       - BUSAN_SCHOOL_CODE=${BUSAN_SCHOOL_CODE}
-      - SPRING_REDIS_HOST=redis
+      - SPRING_REDIS_HOST=redis-main
       - SPRING_REDIS_PORT=6379
     volumes:
       - ./src/main/resources/application-secret.yml:/app/src/main/resources/application-secret.yml
@@ -25,12 +25,12 @@ services:
     depends_on:
       - redis
 
-  help-center-redis-main:
+  redis-main:
     image: redis:latest
-    container_name: help-center-redis-main
+    container_name: helpcenter-redis-main
     ports:
       - "6379:6379"
-    restart: no
+    restart: unless-stopped
     volumes:
       - redis-data:/data
 
