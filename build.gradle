@@ -50,6 +50,12 @@ dependencies {
 
     // Selenium
     implementation 'org.seleniumhq.selenium:selenium-java:latest.release'
+
+    //redis
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+
+    // Jackson JSR310 모듈 추가
+    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
 }
 
 tasks.named('test') {

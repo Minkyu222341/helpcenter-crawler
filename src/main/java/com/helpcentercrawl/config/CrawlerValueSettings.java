@@ -12,6 +12,9 @@ public class CrawlerValueSettings {
     private String chromeDriverPath;
 
     // 경남 사이트 설정
+    @Value("${crawler.sites.gne.code}")
+    private String gneCode;
+
     @Value("${crawler.sites.gne.name}")
     private String gneName;
 
@@ -28,6 +31,9 @@ public class CrawlerValueSettings {
     private String gnePassword;
 
     // 창원 사이트 설정
+    @Value("${crawler.sites.changwon.code}")
+    private String changwonCode;
+
     @Value("${crawler.sites.changwon.name}")
     private String changwonName;
 
@@ -44,6 +50,8 @@ public class CrawlerValueSettings {
     private String changwonPassword;
 
     // 부산교육청-학교 사이트 설정
+    @Value("${crawler.sites.busan-school.code}")
+    private String busanSchoolCode;
     @Value("${crawler.sites.busan-school.name}")
     private String busanSchoolName;
 

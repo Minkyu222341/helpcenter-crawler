@@ -2,6 +2,8 @@ package com.helpcentercrawl.crawler.core;
 
 import com.helpcentercrawl.config.CrawlerValueSettings;
 import com.helpcentercrawl.crawler.domain.SiteCrawler;
+import com.helpcentercrawl.dto.CrawlResultDto;
+import com.helpcentercrawl.service.CrawlResultService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.openqa.selenium.*;
@@ -25,6 +27,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 @RequiredArgsConstructor
 public abstract class AbstractCrawler implements SiteCrawler {
 
+    protected final CrawlResultService crawlResultService;
     protected final CrawlerValueSettings valueSettings;
     protected WebDriver driver;
     protected WebDriverWait wait;
@@ -43,13 +46,10 @@ public abstract class AbstractCrawler implements SiteCrawler {
      */
     @Override
     public final void crawl() {
-        // 운영체제에 따라 자동으로 경로 설정
         if (System.getProperty("os.name").toLowerCase().contains("win")) {
-            // Windows 환경
             System.setProperty(SET_PROPERTY, LOCAL_CHROME_DRIVER_PATH);
             log.info("Windows 환경에서 실행 중: {}", LOCAL_CHROME_DRIVER_PATH);
         } else {
-            // Linux, Mac 등 기타 환경
             System.setProperty(SET_PROPERTY, PROC_CHROME_DRIVER_PATH);
             log.info("Linux/Mac 환경에서 실행 중: {}", PROC_CHROME_DRIVER_PATH);
         }
@@ -70,11 +70,14 @@ public abstract class AbstractCrawler implements SiteCrawler {
             // 5. 결과 출력
             printResults();
 
+            // 6. Redis에 크롤링 결과 저장
+            saveCrawlResultToRedis();
+
         } catch (Exception e) {
             log.error("크롤링 중 오류 발생: {}", e.getMessage());
             log.error("오류 상세 정보:", e);
         } finally {
-            // 6. 리소스 정리
+            // 7. 리소스 정리
             cleanup();
         }
     }
@@ -84,21 +87,6 @@ public abstract class AbstractCrawler implements SiteCrawler {
      */
     protected void initializeWebDriver() {
         ChromeOptions options = getChromeOptions();
-        driver = new ChromeDriver(options);
-        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
-        wait = new WebDriverWait(driver, Duration.ofSeconds(20));
-        today = LocalDate.now();
-        log.info("{} 웹드라이버 초기화 완료", getSiteName());
-    }
-
-    /**
-     * 크롬 옵션 설정 메서드
-     */
-    protected ChromeOptions getChromeOptions() {
-        ChromeOptions options = getOptions();
-
-        // 페이지 로드 전략 설정
-        options.setPageLoadStrategy(PageLoadStrategy.EAGER);
 
         // 성능 매개변수 설정
         Map<String, Object> prefs = new HashMap<>();
@@ -106,20 +94,26 @@ public abstract class AbstractCrawler implements SiteCrawler {
         prefs.put("profile.default_content_setting_values.images", 2);
         options.setExperimentalOption("prefs", prefs);
 
-        return options;
+        driver = new ChromeDriver(options);
+        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
+        wait = new WebDriverWait(driver, Duration.ofSeconds(20));
+        today = LocalDate.now();
+        log.info("{} 웹드라이버 초기화 완료", getSiteName());
     }
 
-    private static ChromeOptions getOptions() {
+    private ChromeOptions getChromeOptions() {
         ChromeOptions options = new ChromeOptions();
         options.addArguments("--headless"); // Docker에서 실행 시 필요
         options.addArguments("--no-sandbox"); // Docker에서 필요
         options.addArguments("--disable-dev-shm-usage"); // Docker에서 필요
-
         options.addArguments("--disable-gpu");
         options.addArguments("--window-size=1920,1080");
         options.addArguments("--disable-extensions");
         options.addArguments("--disable-infobars");
         options.addArguments("--blink-settings=imagesEnabled=false");
+
+        // 페이지 로드 전략 설정
+        options.setPageLoadStrategy(PageLoadStrategy.EAGER);
         return options;
     }
 
@@ -139,19 +133,6 @@ public abstract class AbstractCrawler implements SiteCrawler {
     protected abstract void processPageData() throws InterruptedException;
 
     /**
-     * 단일 페이지의 데이터 처리를 위한 공통 메서드
-     *
-     * @param selector 테이블 행을 선택하기 위한 CSS 선택자
-     */
-    protected void processSinglePage(String selector) {
-        // 테이블 행 가져오기
-        List<WebElement> rows = driver.findElements(By.cssSelector(selector));
-
-        // 행 처리 공통 메서드 호출
-        processRows(rows);
-    }
-
-    /**
      * 여러 페이지의 데이터를 처리하는 공통 메서드
      *
      * @param tableSelector 테이블 행 선택자
@@ -166,8 +147,11 @@ public abstract class AbstractCrawler implements SiteCrawler {
                 navigateToPage(currentPage);
             }
 
-            // 단일 페이지 처리
-            processSinglePage(tableSelector);
+            // 현재 페이지의 테이블 행 가져오기
+            List<WebElement> rows = driver.findElements(By.cssSelector(tableSelector));
+
+            // 행 처리 공통 메서드 호출
+            processRows(rows);
         }
     }
 
@@ -215,26 +199,6 @@ public abstract class AbstractCrawler implements SiteCrawler {
     }
 
     /**
-     * 결과 출력 메서드
-     */
-    protected void printResults() {
-        System.out.println("\n===== " + getSiteName() + " 오늘 요청 통계 =====");
-        System.out.println("오늘 들어온 요청의 개수: " + todayTotal.get() + "건");
-        System.out.println("완료처리된 개수: " + todayCompleted.get() + "건");
-        System.out.println("완료처리가 아닌 개수: " + todayNotCompleted.get() + "건");
-    }
-
-    /**
-     * 리소스 정리 메서드
-     */
-    protected void cleanup() {
-        if (driver != null) {
-            driver.quit();
-            log.info("{} 웹드라이버가 종료되었습니다.", getSiteName());
-        }
-    }
-
-    /**
      * 페이지 완전 로딩 대기 유틸리티 메서드
      */
     protected void waitForPageLoad() {
@@ -275,6 +239,28 @@ public abstract class AbstractCrawler implements SiteCrawler {
                 log.error("행 처리 중 오류 발생: {}", e.getMessage());
             }
         }
+    }
+
+    /**
+     * 날짜 텍스트 추출 유틸리티 메서드
+     */
+    protected String extractDateText(WebElement row) {
+        try {
+            List<WebElement> cells = row.findElements(By.tagName("td"));
+
+            // 모든 셀에서 날짜 형식 찾기
+            for (WebElement cell : cells) {
+                String cellText = cell.getText().trim();
+                // 날짜 형식 패턴 확인 (YYYY. MM. DD 또는 YYYY.MM.DD)
+                if (cellText.matches("\\d{4}[.\\s]+\\d{1,2}[.\\s]+\\d{1,2}.*")) {
+                    return cellText;
+                }
+            }
+        } catch (Exception e) {
+            log.debug("날짜 텍스트 추출 오류: {}", e.getMessage());
+        }
+
+        return "";
     }
 
     /**
@@ -360,24 +346,64 @@ public abstract class AbstractCrawler implements SiteCrawler {
     }
 
     /**
-     * 날짜 텍스트 추출 유틸리티 메서드
+     * 결과 출력 메서드
      */
-    protected String extractDateText(WebElement row) {
+    protected void printResults() {
+        System.out.println("\n===== " + getSiteName() + " 오늘 요청 통계 =====");
+        System.out.println("오늘 들어온 요청의 개수: " + todayTotal.get() + "건");
+        System.out.println("완료처리된 개수: " + todayCompleted.get() + "건");
+        System.out.println("완료처리가 아닌 개수: " + todayNotCompleted.get() + "건");
+    }
+
+    /**
+     * Redis에 크롤링 결과 저장 메서드
+     */
+    protected void saveCrawlResultToRedis() {
         try {
-            List<WebElement> cells = row.findElements(By.tagName("td"));
+            CrawlResultDto currentResult = CrawlResultDto.builder()
+                    .siteCode(getSiteCode())
+                    .siteName(getSiteName())
+                    .completedCount(todayCompleted.get())
+                    .notCompletedCount(todayNotCompleted.get())
+                    .totalCount(todayTotal.get())
+                    .crawlDate(today)
+                    .build();
 
-            // 모든 셀에서 날짜 형식 찾기
-            for (WebElement cell : cells) {
-                String cellText = cell.getText().trim();
-                // 날짜 형식 패턴 확인 (YYYY. MM. DD 또는 YYYY.MM.DD)
-                if (cellText.matches("\\d{4}[.\\s]+\\d{1,2}[.\\s]+\\d{1,2}.*")) {
-                    return cellText;
-                }
+            CrawlResultDto previousResult  = crawlResultService.getCrawlResult(getSiteCode(), today);
+
+            if (isDuplicateData(previousResult, currentResult)) {
+                log.debug("중복된 크롤링 결과로 Redis에 저장하지 않음: {}", getSiteName());
+                return;
             }
-        } catch (Exception e) {
-            log.debug("날짜 텍스트 추출 오류: {}", e.getMessage());
-        }
 
-        return "";
+            crawlResultService.saveCrawlResult(currentResult);
+            log.info("Redis에 크롤링 결과 저장 완료: {}", getSiteName());
+        } catch (Exception e) {
+            log.error("Redis에 크롤링 결과 저장 중 오류 발생: {}", e.getMessage());
+            log.error("오류 상세 정보:", e);
+        }
+    }
+
+    /**
+     * 크롤링 중복 데이터 확인 메서드
+     */
+    private boolean isDuplicateData(CrawlResultDto previousResult, CrawlResultDto currentResult) {
+        if(previousResult != null) {
+            return Objects.equals(previousResult.getTotalCount(), currentResult.getTotalCount()) &&
+                    Objects.equals(previousResult.getCompletedCount(), currentResult.getCompletedCount()) &&
+                    Objects.equals(previousResult.getNotCompletedCount(), currentResult.getNotCompletedCount());
+
+        }
+        return false;
+    }
+
+    /**
+     * 리소스 정리 메서드
+     */
+    protected void cleanup() {
+        if (driver != null) {
+            driver.quit();
+            log.info("{} 웹드라이버가 종료되었습니다.", getSiteName());
+        }
     }
 }

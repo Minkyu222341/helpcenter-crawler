@@ -1,24 +1,46 @@
+server:
+  port: 8081
+
 spring:
   profiles:
     include: secret
+  task:
+    scheduling:
+      pool:
+        size: 5
+  # Redis 설정 추가
+  data:
+    redis:
+      host: help-center-redis-main
+      port: 6379
+      timeout: 10000
+      database: 0
+
+# 크롤링 실행 주기 설정 (ms 단위)
+scheduler:
+  crawler:
+    fixed-delay: 30000  # 30초
 
 crawler:
   chrome-driver:
     path: /usr/local/bin/chromedriver
   sites:
     gne:
+      code: ${GNE_CODE}
       name: 경상남도교육청 헬프센터
       login-url: https://service.gne.go.kr/helpcenter/main.do
       target-url: https://service.gne.go.kr/helpcenter/na/ntt/selectNttList.do?mi=7849&bbsId=2265
       username: ${GNE_USERNAME}
       password: ${GNE_PASSWORD}
     changwon:
+      code: ${CHANGWON_CODE}
       name: 창원대학교 헬프센터
       login-url: https://www.changwon.ac.kr/helpcenter/lo/login/login.do
       target-url: https://www.changwon.ac.kr/helpcenter/na/ntt/selectNttList.do?mi=13160&bbsId=3308
       username: ${CHANGWON_USERNAME}
       password: ${CHANGWON_PASSWORD}
     busan-school:
+      code: ${BUSAN_SCHOOL_CODE}
       name: 부산교육청-학교 헬프센터
       login-url: https://school.busanedu.net/help/lo/login/loginPage.do
       school-target-url: https://school.busanedu.net/help/na/ntt/selectNttList.do?mi=2344&bbsId=5048088
