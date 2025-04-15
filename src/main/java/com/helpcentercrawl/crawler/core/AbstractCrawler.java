@@ -46,12 +46,15 @@ public abstract class AbstractCrawler implements SiteCrawler {
      */
     @Override
     public final void crawl() {
+        // 크롤링 시작 전 초기화
+        todayTotal.set(0);
+        todayCompleted.set(0);
+        todayNotCompleted.set(0);
+
         if (System.getProperty("os.name").toLowerCase().contains("win")) {
             System.setProperty(SET_PROPERTY, LOCAL_CHROME_DRIVER_PATH);
-            log.info("Windows 환경에서 실행 중: {}", LOCAL_CHROME_DRIVER_PATH);
         } else {
             System.setProperty(SET_PROPERTY, PROC_CHROME_DRIVER_PATH);
-            log.info("Linux/Mac 환경에서 실행 중: {}", PROC_CHROME_DRIVER_PATH);
         }
 
         try {
@@ -369,7 +372,7 @@ public abstract class AbstractCrawler implements SiteCrawler {
                     .crawlDate(today)
                     .build();
 
-            CrawlResultDto previousResult  = crawlResultService.getCrawlResult(getSiteCode(), today);
+            CrawlResultDto previousResult = crawlResultService.getCrawlResult(getSiteCode(), today);
 
             if (isDuplicateData(previousResult, currentResult)) {
                 log.debug("중복된 크롤링 결과로 Redis에 저장하지 않음: {}", getSiteName());
@@ -388,7 +391,7 @@ public abstract class AbstractCrawler implements SiteCrawler {
      * 크롤링 중복 데이터 확인 메서드
      */
     private boolean isDuplicateData(CrawlResultDto previousResult, CrawlResultDto currentResult) {
-        if(previousResult != null) {
+        if (previousResult != null) {
             return Objects.equals(previousResult.getTotalCount(), currentResult.getTotalCount()) &&
                     Objects.equals(previousResult.getCompletedCount(), currentResult.getCompletedCount()) &&
                     Objects.equals(previousResult.getNotCompletedCount(), currentResult.getNotCompletedCount());
