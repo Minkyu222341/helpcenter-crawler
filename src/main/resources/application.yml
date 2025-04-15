@@ -8,18 +8,41 @@ spring:
     scheduling:
       pool:
         size: 5
-  # Redis 설정 추가
+
+  # Redis 설정
   data:
     redis:
-      host: help-center-redis-main
+      host: redis-main
       port: 6379
       timeout: 10000
       database: 0
+
+  # MySQL 설정 추가
+  datasource:
+    url: ${MYSQL_URL}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: ${MYSQL_USER}
+    password: ${MYSQL_PASSWORD}
+
+  # JPA 설정 추가
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.MySQL8Dialect
+    open-in-view: false
 
 # 크롤링 실행 주기 설정 (ms 단위)
 scheduler:
   crawler:
     fixed-delay: 30000  # 30초
+  # 데이터 마이그레이션 스케줄러 설정 추가
+  migration:
+    cron: "0 0 22 * * ?"  # 매일 오후 10시에 실행
+#    cron: "0 * * * * ?"  # 매 분마다 실행
 
 crawler:
   chrome-driver:

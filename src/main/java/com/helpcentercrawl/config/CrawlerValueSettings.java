@@ -69,4 +69,13 @@ public class CrawlerValueSettings {
 
     @Value("${crawler.sites.busan-school.password}")
     private String busanSchoolPassword;
+
+    //스케줄러 설정
+    // 크롤러 실행 주기 설정
+    @Value("${scheduler.crawler.fixed-delay}")
+    private String crawlerFixedDelay;
+
+    // 데이터 마이그레이션 스케줄러 설정
+    @Value("${scheduler.migration.cron}")
+    private String migrationCron;
 }
