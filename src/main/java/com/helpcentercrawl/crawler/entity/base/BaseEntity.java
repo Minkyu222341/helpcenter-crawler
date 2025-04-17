@@ -1,4 +1,4 @@
-package com.helpcentercrawl.entity.base;
+package com.helpcentercrawl.crawler.entity.base;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.EntityListeners;

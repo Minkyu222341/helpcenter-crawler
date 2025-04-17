@@ -1,6 +1,6 @@
-package com.helpcentercrawl.entity;
+package com.helpcentercrawl.crawler.entity;
 
-import com.helpcentercrawl.entity.base.BaseEntity;
+import com.helpcentercrawl.crawler.entity.base.BaseEntity;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;

@@ -1,9 +1,9 @@
-package com.helpcentercrawl.service;
+package com.helpcentercrawl.db;
 
-import com.helpcentercrawl.dto.CrawlResultDto;
-import com.helpcentercrawl.entity.CrawlResult;
-import com.helpcentercrawl.repository.CrawlResultRepository;
-import com.helpcentercrawl.util.RedisUtil;
+import com.helpcentercrawl.crawler.dto.CrawlResultDto;
+import com.helpcentercrawl.crawler.entity.CrawlResult;
+import com.helpcentercrawl.crawler.repository.CrawlResultRepository;
+import com.helpcentercrawl.common.util.RedisUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -18,6 +18,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * Redis에서 RDB로 데이터 마이그레이션하는 서비스
+ */
 @Slf4j
 @Service
 @RequiredArgsConstructor

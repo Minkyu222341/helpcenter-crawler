@@ -1,9 +1,9 @@
 package com.helpcentercrawl.crawler.core;
 
-import com.helpcentercrawl.config.CrawlerValueSettings;
-import com.helpcentercrawl.crawler.domain.SiteCrawler;
-import com.helpcentercrawl.dto.CrawlResultDto;
-import com.helpcentercrawl.service.CrawlResultService;
+import com.helpcentercrawl.common.config.CrawlerValueSettings;
+import com.helpcentercrawl.crawler.interfaces.SiteCrawler;
+import com.helpcentercrawl.crawler.dto.CrawlResultDto;
+import com.helpcentercrawl.crawler.service.CrawlResultService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.openqa.selenium.*;

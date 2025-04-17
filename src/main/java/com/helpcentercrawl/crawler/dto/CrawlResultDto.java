@@ -1,4 +1,4 @@
-package com.helpcentercrawl.dto;
+package com.helpcentercrawl.crawler.dto;
 
 import lombok.Builder;
 import lombok.Getter;

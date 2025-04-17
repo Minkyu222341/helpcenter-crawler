@@ -1,4 +1,4 @@
-package com.helpcentercrawl.util;
+package com.helpcentercrawl.common.util;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
