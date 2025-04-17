@@ -1,8 +1,8 @@
 package com.helpcentercrawl.crawler.impl;
 
-import com.helpcentercrawl.config.CrawlerValueSettings;
+import com.helpcentercrawl.common.config.CrawlerValueSettings;
 import com.helpcentercrawl.crawler.core.AbstractCrawler;
-import com.helpcentercrawl.service.CrawlResultService;
+import com.helpcentercrawl.crawler.service.CrawlResultService;
 import lombok.extern.slf4j.Slf4j;
 import org.openqa.selenium.By;
 import org.openqa.selenium.support.ui.ExpectedConditions;

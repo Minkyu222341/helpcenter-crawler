@@ -1,6 +1,6 @@
-package com.helpcentercrawl.service;
+package com.helpcentercrawl.scheduler;
 
-import com.helpcentercrawl.crawler.domain.SiteCrawler;
+import com.helpcentercrawl.crawler.interfaces.SiteCrawler;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -8,6 +8,9 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+/**
+ * 주기적으로 크롤링을 실행하는 서비스
+ */
 @Slf4j
 @Service
 @RequiredArgsConstructor

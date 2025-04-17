@@ -1,4 +1,4 @@
-package com.helpcentercrawl.config;
+package com.helpcentercrawl.common.config;
 
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;

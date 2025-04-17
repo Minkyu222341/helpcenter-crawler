@@ -1,7 +1,7 @@
-package com.helpcentercrawl.service;
+package com.helpcentercrawl.crawler.service;
 
-import com.helpcentercrawl.dto.CrawlResultDto;
-import com.helpcentercrawl.repository.CrawlResultRedisRepository;
+import com.helpcentercrawl.crawler.dto.CrawlResultDto;
+import com.helpcentercrawl.crawler.repository.CrawlResultRedisRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
