@@ -3,7 +3,7 @@ package com.helpcentercrawl.dashboard.repository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.helpcentercrawl.common.util.KeyGenerator;
-import com.helpcentercrawl.dashboard.dto.DashBoardResponseDto;
+import com.helpcentercrawl.dashboard.dto.DashboardResponseDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -26,9 +26,9 @@ public class DashboardResultRedisRepository {
     /**
      * 특정 날짜에 해당하는 모든 사이트의 크롤링 결과 조회
      */
-    public List<DashBoardResponseDto> getAllCrawlResultsByDate(LocalDate date) {
+    public List<DashboardResponseDto> getAllCrawlResultsByDate(LocalDate date) {
         String pattern = keyGenerator.generateKey(date);
-        List<DashBoardResponseDto> results = new ArrayList<>();
+        List<DashboardResponseDto> results = new ArrayList<>();
 
         // Redis에서 패턴과 일치하는 모든 키 가져오기
         Set<String> keys = redisTemplate.keys(pattern);
@@ -39,7 +39,7 @@ public class DashboardResultRedisRepository {
 
                 if (jsonValue != null) {
                     try {
-                        DashBoardResponseDto dto = objectMapper.readValue(jsonValue, DashBoardResponseDto.class);
+                        DashboardResponseDto dto = objectMapper.readValue(jsonValue, DashboardResponseDto.class);
                         results.add(dto);
                     } catch (JsonProcessingException e) {
                         log.error("JSON 역직렬화 중 오류 발생 (키: {}): {}", key, e.getMessage(), e);

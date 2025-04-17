@@ -5,7 +5,7 @@ import lombok.Getter;
 import java.time.LocalDate;
 
 @Getter
-public class DashBoardResponseDto {
+public class DashboardResponseDto {
     private String siteCode;
     private String siteName;
     private Integer completedCount;
