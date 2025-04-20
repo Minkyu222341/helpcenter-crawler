@@ -1,6 +1,7 @@
 package com.helpcentercrawl.crawler.core;
 
 import com.helpcentercrawl.common.config.CrawlerValueSettings;
+import com.helpcentercrawl.crawler.dto.CrawlSaveDto;
 import com.helpcentercrawl.crawler.interfaces.SiteCrawler;
 import com.helpcentercrawl.crawler.dto.CrawlResultDto;
 import com.helpcentercrawl.crawler.service.CrawlResultService;
@@ -13,6 +14,8 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.time.Duration;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,6 +39,7 @@ public abstract class AbstractCrawler implements SiteCrawler {
     protected AtomicInteger todayCompleted = new AtomicInteger(0);
     protected AtomicInteger todayNotCompleted = new AtomicInteger(0);
 
+    private static final String LAST_UPDATED_TIME = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
     private static final String LOCAL_CHROME_DRIVER_PATH = "src/main/resources/chromedriver/windows/chromedriver.exe";
     private static final String PROC_CHROME_DRIVER_PATH = "/usr/bin/chromedriver";
     private static final String SET_PROPERTY = "webdriver.chrome.driver";
@@ -363,13 +367,14 @@ public abstract class AbstractCrawler implements SiteCrawler {
      */
     protected void saveCrawlResultToRedis() {
         try {
-            CrawlResultDto currentResult = CrawlResultDto.builder()
+            CrawlSaveDto currentResult = CrawlSaveDto.builder()
                     .siteCode(getSiteCode())
                     .siteName(getSiteName())
                     .completedCount(todayCompleted.get())
                     .notCompletedCount(todayNotCompleted.get())
                     .totalCount(todayTotal.get())
                     .crawlDate(today)
+                    .lastUpdatedAt(LAST_UPDATED_TIME)
                     .build();
 
             CrawlResultDto previousResult = crawlResultService.getCrawlResult(getSiteCode(), today);
@@ -390,7 +395,7 @@ public abstract class AbstractCrawler implements SiteCrawler {
     /**
      * 크롤링 중복 데이터 확인 메서드
      */
-    private boolean isDuplicateData(CrawlResultDto previousResult, CrawlResultDto currentResult) {
+    private boolean isDuplicateData(CrawlResultDto previousResult, CrawlSaveDto currentResult) {
         if (previousResult != null) {
             return Objects.equals(previousResult.getTotalCount(), currentResult.getTotalCount()) &&
                     Objects.equals(previousResult.getCompletedCount(), currentResult.getCompletedCount()) &&
