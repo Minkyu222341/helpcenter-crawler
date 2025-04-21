@@ -1,11 +1,12 @@
 package com.helpcentercrawl.crawler.dto;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 /**
  * packageName    : com.helpcentercrawl.crawler.dto
@@ -27,11 +28,13 @@ public class CrawlSaveDto {
 	private Integer notCompletedCount;
 	private Integer totalCount;
 	private LocalDate crawlDate;
-	private String lastUpdatedAt;
+
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+	private LocalDateTime lastUpdatedAt;
 
 	@Builder
 	public CrawlSaveDto(String siteCode, String siteName, Integer completedCount, Integer notCompletedCount,
-		Integer totalCount, LocalDate crawlDate, String lastUpdatedAt) {
+		Integer totalCount, LocalDate crawlDate, LocalDateTime lastUpdatedAt) {
 		this.siteCode = siteCode;
 		this.siteName = siteName;
 		this.completedCount = completedCount;

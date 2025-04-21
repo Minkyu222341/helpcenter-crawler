@@ -1,9 +1,9 @@
 package com.helpcentercrawl.crawler.core;
 
 import com.helpcentercrawl.common.config.CrawlerValueSettings;
+import com.helpcentercrawl.crawler.dto.CrawlResultDto;
 import com.helpcentercrawl.crawler.dto.CrawlSaveDto;
 import com.helpcentercrawl.crawler.interfaces.SiteCrawler;
-import com.helpcentercrawl.crawler.dto.CrawlResultDto;
 import com.helpcentercrawl.crawler.service.CrawlResultService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,7 +15,7 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
+import java.time.ZoneId;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -39,7 +39,6 @@ public abstract class AbstractCrawler implements SiteCrawler {
     protected AtomicInteger todayCompleted = new AtomicInteger(0);
     protected AtomicInteger todayNotCompleted = new AtomicInteger(0);
 
-    private static final String LAST_UPDATED_TIME = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
     private static final String LOCAL_CHROME_DRIVER_PATH = "src/main/resources/chromedriver/windows/chromedriver.exe";
     private static final String PROC_CHROME_DRIVER_PATH = "/usr/bin/chromedriver";
     private static final String SET_PROPERTY = "webdriver.chrome.driver";
@@ -366,6 +365,9 @@ public abstract class AbstractCrawler implements SiteCrawler {
      * Redis에 크롤링 결과 저장 메서드
      */
     protected void saveCrawlResultToRedis() {
+        // 오늘 날짜와 현재 시간 가져오기
+        LocalDateTime lastUpdatedTime = LocalDateTime.now(ZoneId.of("Asia/Seoul"));
+
         try {
             CrawlSaveDto currentResult = CrawlSaveDto.builder()
                     .siteCode(getSiteCode())
@@ -374,13 +376,13 @@ public abstract class AbstractCrawler implements SiteCrawler {
                     .notCompletedCount(todayNotCompleted.get())
                     .totalCount(todayTotal.get())
                     .crawlDate(today)
-                    .lastUpdatedAt(LAST_UPDATED_TIME)
+                    .lastUpdatedAt(lastUpdatedTime)
                     .build();
 
             CrawlResultDto previousResult = crawlResultService.getCrawlResult(getSiteCode(), today);
 
             if (isDuplicateData(previousResult, currentResult)) {
-                log.debug("중복된 크롤링 결과로 Redis에 저장하지 않음: {}", getSiteName());
+                log.info("중복된 크롤링 결과로 Redis에 저장하지 않음: {}", getSiteName());
                 return;
             }
 
