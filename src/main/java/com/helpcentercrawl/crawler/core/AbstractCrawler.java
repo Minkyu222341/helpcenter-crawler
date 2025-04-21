@@ -1,8 +1,9 @@
 package com.helpcentercrawl.crawler.core;
 
 import com.helpcentercrawl.common.config.CrawlerValueSettings;
-import com.helpcentercrawl.crawler.interfaces.SiteCrawler;
 import com.helpcentercrawl.crawler.dto.CrawlResultDto;
+import com.helpcentercrawl.crawler.dto.CrawlSaveDto;
+import com.helpcentercrawl.crawler.interfaces.SiteCrawler;
 import com.helpcentercrawl.crawler.service.CrawlResultService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -13,6 +14,8 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.time.Duration;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -362,20 +365,24 @@ public abstract class AbstractCrawler implements SiteCrawler {
      * Redis에 크롤링 결과 저장 메서드
      */
     protected void saveCrawlResultToRedis() {
+        // 오늘 날짜와 현재 시간 가져오기
+        LocalDateTime lastUpdatedTime = LocalDateTime.now(ZoneId.of("Asia/Seoul"));
+
         try {
-            CrawlResultDto currentResult = CrawlResultDto.builder()
+            CrawlSaveDto currentResult = CrawlSaveDto.builder()
                     .siteCode(getSiteCode())
                     .siteName(getSiteName())
                     .completedCount(todayCompleted.get())
                     .notCompletedCount(todayNotCompleted.get())
                     .totalCount(todayTotal.get())
                     .crawlDate(today)
+                    .lastUpdatedAt(lastUpdatedTime)
                     .build();
 
             CrawlResultDto previousResult = crawlResultService.getCrawlResult(getSiteCode(), today);
 
             if (isDuplicateData(previousResult, currentResult)) {
-                log.debug("중복된 크롤링 결과로 Redis에 저장하지 않음: {}", getSiteName());
+                log.info("중복된 크롤링 결과로 Redis에 저장하지 않음: {}", getSiteName());
                 return;
             }
 
@@ -390,7 +397,7 @@ public abstract class AbstractCrawler implements SiteCrawler {
     /**
      * 크롤링 중복 데이터 확인 메서드
      */
-    private boolean isDuplicateData(CrawlResultDto previousResult, CrawlResultDto currentResult) {
+    private boolean isDuplicateData(CrawlResultDto previousResult, CrawlSaveDto currentResult) {
         if (previousResult != null) {
             return Objects.equals(previousResult.getTotalCount(), currentResult.getTotalCount()) &&
                     Objects.equals(previousResult.getCompletedCount(), currentResult.getCompletedCount()) &&

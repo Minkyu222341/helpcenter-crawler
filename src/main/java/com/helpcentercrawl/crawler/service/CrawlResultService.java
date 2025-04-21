@@ -1,6 +1,7 @@
 package com.helpcentercrawl.crawler.service;
 
 import com.helpcentercrawl.crawler.dto.CrawlResultDto;
+import com.helpcentercrawl.crawler.dto.CrawlSaveDto;
 import com.helpcentercrawl.crawler.repository.CrawlResultRedisRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,10 +19,10 @@ public class CrawlResultService {
     /**
      * 크롤링 결과를 Redis에 저장
      */
-    public void saveCrawlResult(CrawlResultDto crawlResultDto) {
+    public void saveCrawlResult(CrawlSaveDto crawlSaveDto) {
         try {
-            crawlResultRedisRepository.saveCrawlResult(crawlResultDto);
-            log.info("Redis에 크롤링 결과 저장 완료: {}", crawlResultDto.getSiteName());
+            crawlResultRedisRepository.saveCrawlResult(crawlSaveDto);
+            log.info("Redis에 크롤링 결과 저장 완료: {}", crawlSaveDto.getSiteName());
         } catch (Exception e) {
             log.error("Redis에 크롤링 결과 저장 중 오류 발생: {}", e.getMessage(), e);
             throw e;
