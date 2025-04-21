@@ -18,7 +18,7 @@ echo "Docker 컨테이너 중지 및 삭제..."
 docker compose down
 
 echo "Docker 이미지 빌드..."
-docker compose build --no-cache
+docker compose build
 
 echo "불필요한 이미지 정리..."
 docker image prune -f

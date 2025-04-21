@@ -47,6 +47,10 @@ public class CrawlResultRedisRepository {
         String key = keyGenerator.generateKey(siteCode, date);
         String jsonValue = redisTemplate.opsForValue().get(key);
 
+        if (jsonValue == null) {
+            return null;
+        }
+
         try {
             return objectMapper.readValue(jsonValue, CrawlResultDto.class);
         } catch (JsonProcessingException e) {
