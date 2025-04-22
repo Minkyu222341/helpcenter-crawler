@@ -8,6 +8,18 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
 
+/**
+ * packageName    : com.helpcentercrawl.crawler.repository
+ * fileName       : CrawlResultRepository
+ * author         : MinKyu Park
+ * date           : 25. 4. 21.
+ * description    : 크롤링 결과를 저장하는 Repository
+ * ===========================================================
+ * DATE              AUTHOR             NOTE
+ * -----------------------------------------------------------
+ * 25. 4. 21.        MinKyu Park       최초 생성
+ */
+
 @Repository
 public interface CrawlResultRepository extends JpaRepository<CrawlResult, Long> {
 

@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
  * fileName       : CrawlSaveDto
  * author         : MinKyu Park
  * date           : 2025-04-18
- * description    :
+ * description    : 크롤링 결과를 Redis에 저장하기 위한 DTO
  * ===========================================================
  * DATE              AUTHOR             NOTE
  * -----------------------------------------------------------

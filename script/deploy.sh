@@ -3,6 +3,8 @@
 # 스크립트에 실행 권한 부여
 chmod +x "$0"
 
+export SPRING_PROFILES_ACTIVE=prod
+
 echo "애플리케이션 빌드 시작..."
 ./gradlew clean bootJar
 

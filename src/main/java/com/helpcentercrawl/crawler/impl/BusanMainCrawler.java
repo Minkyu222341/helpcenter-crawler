@@ -11,74 +11,71 @@ import org.springframework.stereotype.Component;
 
 /**
  * packageName    : com.helpcentercrawl.crawler.impl
- * fileName       : ChangwonCrawler
+ * fileName       : BusanMainCrawler
  * author         : MinKyu Park
  * date           : 25. 4. 22.
- * description    : 창원대 지원센터 크롤러
+ * description    : 부산본청 지원센터 크롤러
  * ===========================================================
  * DATE              AUTHOR             NOTE
  * -----------------------------------------------------------
  * 25. 4. 22.        MinKyu Park       최초 생성
  */
-
 @Slf4j
 @Component
-public class ChangwonCrawler extends AbstractCrawler {
-
-
-    public ChangwonCrawler(CrawlResultService crawlResultService, CrawlerValueSettings valueSettings) {
+public class BusanMainCrawler extends AbstractCrawler {
+    public BusanMainCrawler(CrawlResultService crawlResultService, CrawlerValueSettings valueSettings) {
         super(crawlResultService, valueSettings);
     }
 
     @Override
-    public String getSiteName() {
-        return valueSettings.getChangwonName();
-    }
-
-    @Override
-    public String getSiteCode() {
-        return valueSettings.getChangwonCode();
-    }
-
-
-    @Override
     protected void accessUrl() {
-        driver.get(valueSettings.getChangwonLoginUrl());
+        driver.get(valueSettings.getBusanMainLoginUrl());
     }
 
     @Override
     protected void accessLogin() {
-        // 아이디 입력 필드 찾기 및 입력
         WebElement idInput = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("mberId")));
         idInput.clear();
-        idInput.sendKeys(valueSettings.getChangwonUsername());
+        idInput.sendKeys(valueSettings.getBusanMainUsername());
 
-        // 비밀번호 입력 필드 찾기 및 입력
         WebElement pwInput = driver.findElement(By.id("mberPassword"));
         pwInput.clear();
-        pwInput.sendKeys(valueSettings.getChangwonPassword());
+        pwInput.sendKeys(valueSettings.getBusanMainPassword());
 
-        // 로그인 버튼 클릭
-        WebElement loginButton = wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("a.btn_Login")));
+        WebElement loginButton = wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("button.btnLogin[onclick*='login()']")));
         loginButton.click();
-
     }
 
     @Override
-    protected void handlePopup() {
+    protected void handlePopup() throws InterruptedException {
+        if (isElementPresent(By.cssSelector(".jconfirm-box"))) {
+            WebElement confirmButton = driver.findElement(By.cssSelector(".jconfirm-buttons .btn.btn-blue"));
+            confirmButton.click();
+
+            Thread.sleep(1000);
+        }
     }
 
 
     @Override
     protected void navigateToTargetPage() {
-        driver.get(valueSettings.getChangwonTargetUrl());
-        log.info("창원 헬프센터 접속 완료");
+        driver.get(valueSettings.getBusanMainTargetUrl());
+
+        log.info("부산본청 헬프센터 접속 완료");
     }
 
     @Override
-    protected void processPageData() throws InterruptedException {
-        Thread.sleep(2000);
+    protected void processPageData() {
+        processMultiplePages("table tbody tr");
+    }
 
-        processMultiplePages("table#nttTable > tbody > tr");
+    @Override
+    public String getSiteName() {
+        return valueSettings.getBusanMainName();
+    }
+
+    @Override
+    public String getSiteCode() {
+        return valueSettings.getBusanMainCode();
     }
 }

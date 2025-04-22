@@ -7,7 +7,10 @@ import com.helpcentercrawl.crawler.interfaces.SiteCrawler;
 import com.helpcentercrawl.crawler.service.CrawlResultService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.openqa.selenium.*;
+import org.openqa.selenium.By;
+import org.openqa.selenium.PageLoadStrategy;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -23,8 +26,15 @@ import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * 헬프센터 크롤링을 위한 추상 클래스
- * 템플릿 메서드 패턴을 적용하여 공통 로직 추상화
+ * packageName    : com.helpcentercrawl.crawler.core
+ * fileName       : AbstractCrawler
+ * author         : MinKyu Park
+ * date           : 25. 4. 22.
+ * description    : 크롤러 구현체들의 공통 동작을 정의한 추상 클래스
+ * ===========================================================
+ * DATE              AUTHOR             NOTE
+ * -----------------------------------------------------------
+ * 25. 4. 22.        MinKyu Park       최초 생성
  */
 @Slf4j
 @RequiredArgsConstructor
@@ -126,7 +136,37 @@ public abstract class AbstractCrawler implements SiteCrawler {
     /**
      * 로그인 처리 메서드
      */
-    protected abstract void login() throws InterruptedException;
+    protected void login() {
+
+        try {
+            accessUrl();
+            Thread.sleep(1000);
+            accessLogin();
+            Thread.sleep(1000);
+            handlePopup();
+            Thread.sleep(1000);
+
+            log.info("{} 로그인 성공", getSiteName());
+        } catch (Exception e) {
+            log.error("{} 로그인 처리 중 오류 발생: {}", getSiteName(), e.getMessage(), e);
+            throw new RuntimeException("로그인 실패", e);
+        }
+    }
+    /**
+     * 로그인 URL 접근 메서드
+     */
+    protected abstract void accessUrl();
+
+    /**
+     * 로그인 처리 메서드
+     */
+    protected abstract void accessLogin() throws InterruptedException;
+
+    /**
+     * 팝업 처리 메서드
+     */
+    protected abstract void handlePopup() throws InterruptedException;
+
 
     /**
      * 대상 페이지로 이동하는 메서드
@@ -187,7 +227,7 @@ public abstract class AbstractCrawler implements SiteCrawler {
     }
 
     /**
-     * 특정 페이지로 이동하는 메서드
+     * 페이지를 이동 하는 메서드
      */
     protected void navigateToPage(int pageNumber) {
         try {
@@ -196,25 +236,9 @@ public abstract class AbstractCrawler implements SiteCrawler {
             WebElement pageLink = driver.findElement(By.xpath(pageXpath));
             pageLink.click();
 
-            // 페이지 로딩 대기
-            waitForPageLoad();
         } catch (Exception e) {
             log.error("{}페이지로 이동 중 오류 발생: {}", pageNumber, e.getMessage());
             throw e;
-        }
-    }
-
-    /**
-     * 페이지 완전 로딩 대기 유틸리티 메서드
-     */
-    protected void waitForPageLoad() {
-        try {
-            wait.until(webDriver ->
-                    Objects.equals(((JavascriptExecutor) webDriver).executeScript("return document.readyState"), "complete"));
-            // 추가 대기 시간 - AJAX 로딩 등을 위한 시간
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
         }
     }
 
@@ -414,6 +438,20 @@ public abstract class AbstractCrawler implements SiteCrawler {
         if (driver != null) {
             driver.quit();
             log.info("{} 웹드라이버가 종료되었습니다.", getSiteName());
+        }
+    }
+
+    /**
+     * 특정 요소가 존재하는지 확인하는 유틸리티 메서드
+     */
+    protected boolean isElementPresent(By locator) throws InterruptedException {
+        Thread.sleep(1500);
+
+        try {
+            driver.findElement(locator);
+            return true;
+        } catch (org.openqa.selenium.NoSuchElementException e) {
+            return false;
         }
     }
 }

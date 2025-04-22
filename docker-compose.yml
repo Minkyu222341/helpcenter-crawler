@@ -16,19 +16,6 @@ services:
       # Redis 설정
       - SPRING_REDIS_HOST=redis-main
       - SPRING_REDIS_PORT=6379
-      # 크롤링 사이트 설정
-      - GNE_USERNAME=${GNE_USERNAME}
-      - GNE_PASSWORD=${GNE_PASSWORD}
-      - GNE_CODE=${GNE_CODE}
-      - CHANGWON_USERNAME=${CHANGWON_USERNAME}
-      - CHANGWON_PASSWORD=${CHANGWON_PASSWORD}
-      - CHANGWON_CODE=${CHANGWON_CODE}
-      - BUSAN_SCHOOL_USERNAME=${BUSAN_SCHOOL_USERNAME}
-      - BUSAN_SCHOOL_PASSWORD=${BUSAN_SCHOOL_PASSWORD}
-      - BUSAN_SCHOOL_CODE=${BUSAN_SCHOOL_CODE}
-    volumes:
-      # 비밀 설정 파일을 컨테이너에 마운트
-      - ./src/main/resources/application-secret.yml:/app/src/main/resources/application-secret.yml
     restart: unless-stopped
     depends_on:
       redis-main:

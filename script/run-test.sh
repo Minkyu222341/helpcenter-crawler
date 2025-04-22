@@ -3,6 +3,8 @@
 # 스크립트에 실행 권한 부여
 chmod +x "$0"
 
+export SPRING_PROFILES_ACTIVE=dev
+
 # .env 파일 존재 여부 확인
 if [ ! -f .env ]; then
     echo "오류: .env 파일이 존재하지 않습니다."
