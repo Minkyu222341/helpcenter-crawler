@@ -13,6 +13,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.time.Duration;
@@ -152,6 +153,7 @@ public abstract class AbstractCrawler implements SiteCrawler {
             throw new RuntimeException("로그인 실패", e);
         }
     }
+
     /**
      * 로그인 URL 접근 메서드
      */
@@ -444,13 +446,14 @@ public abstract class AbstractCrawler implements SiteCrawler {
     /**
      * 특정 요소가 존재하는지 확인하는 유틸리티 메서드
      */
-    protected boolean isElementPresent(By locator) throws InterruptedException {
-        Thread.sleep(1500);
+    protected boolean isElementPresent(By locator) {
+        WebDriverWait shortWait = new WebDriverWait(driver, Duration.ofSeconds(2));
+        shortWait.until(ExpectedConditions.presenceOfElementLocated(locator));
 
         try {
             driver.findElement(locator);
             return true;
-        } catch (org.openqa.selenium.NoSuchElementException e) {
+        } catch (org.openqa.selenium.TimeoutException e) {
             return false;
         }
     }

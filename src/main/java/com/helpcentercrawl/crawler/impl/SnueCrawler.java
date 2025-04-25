@@ -50,7 +50,7 @@ public class SnueCrawler extends AbstractCrawler {
     }
 
     @Override
-    protected void handlePopup() throws InterruptedException {
+    protected void handlePopup() {
         if (isElementPresent(By.id("mainBtn"))) {
             WebElement laterButton = driver.findElement(By.id("mainBtn"));
             laterButton.click();

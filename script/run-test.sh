@@ -5,12 +5,11 @@ chmod +x "$0"
 
 export SPRING_PROFILES_ACTIVE=dev
 
-# .env 파일 존재 여부 확인
 if [ ! -f .env ]; then
-    echo "오류: .env 파일이 존재하지 않습니다."
     echo ".env 파일을 생성하고 필요한 환경변수를 설정해주세요."
-    echo "필요한 환경변수: MYSQL_USER, MYSQL_PASSWORD, MYSQL_ROOT_PASSWORD, MYSQL_URL, 크롤링 사이트 설정 등"
     exit 1
+else
+    source .env
 fi
 
 echo "애플리케이션 빌드 시작..."

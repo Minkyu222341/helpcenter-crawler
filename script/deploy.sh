@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# 오류 발생 시 즉시 종료 설정
+set -euo pipefail
+
 # 스크립트에 실행 권한 부여
 chmod +x "$0"
 

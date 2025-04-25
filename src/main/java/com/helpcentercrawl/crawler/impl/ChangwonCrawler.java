@@ -77,7 +77,7 @@ public class ChangwonCrawler extends AbstractCrawler {
 
     @Override
     protected void processPageData() throws InterruptedException {
-        Thread.sleep(2000);
+        wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("table#nttTable > tbody > tr")));
 
         processMultiplePages("table#nttTable > tbody > tr");
     }

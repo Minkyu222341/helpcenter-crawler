@@ -1,3 +1,6 @@
+server:
+  port: 8081
+
 # 크롤링 실행 주기 설정 (ms 단위)
 scheduler:
   crawler:
@@ -7,12 +10,11 @@ scheduler:
     cron: "0 * * * * ?"  # 매 분마다 실행
 
 spring:
-  # MySQL 설정 추가
   datasource:
-    url: ${spring.datasource.url}
+    url: ${spring.datasource.url:?DB URL이 설정되지 않았습니다. application-secret.yml이 올바르게 로드되었는지 확인하세요}
     driver-class-name: com.mysql.cj.jdbc.Driver
-    username: ${spring.datasource.username}
-    password: ${spring.datasource.password}
+    username: ${spring.datasource.username:?DB 사용자명이 설정되지 않았습니다. application-secret.yml을 확인하세요}
+    password: ${spring.datasource.password:?DB 비밀번호가 설정되지 않았습니다. application-secret.yml을 확인하세요}
 
   # Redis 설정
   data:
@@ -25,7 +27,7 @@ spring:
   # JPA 설정 추가
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: validate
     show-sql: true
     properties:
       hibernate:

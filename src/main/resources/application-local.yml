@@ -1,3 +1,6 @@
+server:
+  port: 8081
+
 spring:
   # H2 데이터베이스 설정
   datasource:

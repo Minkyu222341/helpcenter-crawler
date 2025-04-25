@@ -6,6 +6,7 @@ import com.helpcentercrawl.crawler.service.CrawlResultService;
 import lombok.extern.slf4j.Slf4j;
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -78,18 +79,25 @@ public class GneCrawler extends AbstractCrawler {
 
     @Override
     protected void handlePopup() throws InterruptedException {
-
-        WebDriverWait alertWait = new WebDriverWait(driver, Duration.ofSeconds(3));
-        Alert alert = alertWait.until(ExpectedConditions.alertIsPresent());
-
-        if (alert != null) {
+        try {
+            WebDriverWait alertWait = new WebDriverWait(driver, Duration.ofSeconds(3));
+            Alert alert = alertWait.until(ExpectedConditions.alertIsPresent());
             String alertText = alert.getText();
 
             if (alertText.contains("해당 아이디로 로그인한 이용자가 있습니다")) {
                 alert.accept();
-
-                Thread.sleep(2000);
+                // 명시적 대기로 변경
+                wait.until(d -> {
+                    try {
+                        d.getTitle();
+                        return true;
+                    } catch (Exception e) {
+                        return false;
+                    }
+                });
             }
+        } catch (TimeoutException ignored) {
+
         }
     }
 
