@@ -23,7 +23,7 @@ public class SchedulerService {
      */
     @Scheduled(fixedDelayString = "${scheduler.crawler.fixed-delay:30000}")
     public void runCrawlers() {
-        log.info("주기적인 크롤링 시작: {} 개 사이트", crawlers.size());
+        log.info("크롤링 시작: {} 개 사이트", crawlers.size());
 
         for (SiteCrawler crawler : crawlers) {
             try {
@@ -34,6 +34,6 @@ public class SchedulerService {
             }
         }
 
-        log.info("주기적인 크롤링 완료");
+        log.info("크롤링 완료");
     }
 }

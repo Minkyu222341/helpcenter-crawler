@@ -1,6 +1,3 @@
-server:
-  port: 8081
-
 spring:
   profiles:
     include: secret
@@ -9,64 +6,50 @@ spring:
       pool:
         size: 5
 
-  # Redis 설정
-  data:
-    redis:
-      host: redis-main
-      port: 6379
-      timeout: 10000
-      database: 0
-
-  # MySQL 설정 추가
-  datasource:
-    url: ${MYSQL_URL}
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    username: ${MYSQL_USER}
-    password: ${MYSQL_PASSWORD}
-
-  # JPA 설정 추가
-  jpa:
-    hibernate:
-      ddl-auto: update
-    show-sql: true
-    properties:
-      hibernate:
-        format_sql: true
-        dialect: org.hibernate.dialect.MySQL8Dialect
-    open-in-view: false
-
-# 크롤링 실행 주기 설정 (ms 단위)
-scheduler:
-  crawler:
-    fixed-delay: 30000  # 30초
-  # 데이터 마이그레이션 스케줄러 설정 추가
-  migration:
-    cron: "0 0 22 * * ?"  # 매일 오후 10시에 실행
-#    cron: "0 * * * * ?"  # 매 분마다 실행
-
 crawler:
   chrome-driver:
     path: /usr/local/bin/chromedriver
   sites:
     gne:
-      code: ${GNE_CODE}
+      code: ${crawler.sites.gne.code}
       name: 경상남도교육청 헬프센터
       login-url: https://service.gne.go.kr/helpcenter/main.do
       target-url: https://service.gne.go.kr/helpcenter/na/ntt/selectNttList.do?mi=7849&bbsId=2265
-      username: ${GNE_USERNAME}
-      password: ${GNE_PASSWORD}
+      username: ${crawler.sites.gne.username}
+      password: ${crawler.sites.gne.password}
     changwon:
-      code: ${CHANGWON_CODE}
+      code: ${crawler.sites.changwon.code}
       name: 창원대학교 헬프센터
-      login-url: https://www.changwon.ac.kr/helpcenter/lo/login/login.do
+      login-url: https://www.changwon.ac.kr/helpcenter/lo/login/loginPage.do
       target-url: https://www.changwon.ac.kr/helpcenter/na/ntt/selectNttList.do?mi=13160&bbsId=3308
-      username: ${CHANGWON_USERNAME}
-      password: ${CHANGWON_PASSWORD}
+      username: ${crawler.sites.changwon.username}
+      password: ${crawler.sites.changwon.password}
     busan-school:
-      code: ${BUSAN_SCHOOL_CODE}
+      code: ${crawler.sites.busan-school.code}
       name: 부산교육청-학교 헬프센터
       login-url: https://school.busanedu.net/help/lo/login/loginPage.do
       school-target-url: https://school.busanedu.net/help/na/ntt/selectNttList.do?mi=2344&bbsId=5048088
       kindergarten-target-url: https://school.busanedu.net/help/na/ntt/selectNttList.do?mi=1854&bbsId=3000410
-      username: ${BUSAN_SCHOOL_USERNAME}
-      password: ${BUSAN_SCHOOL_PASSWORD}
+      username: ${crawler.sites.busan-school.username}
+      password: ${crawler.sites.busan-school.password}
+    busan-admin:
+      code: ${crawler.sites.busan-admin.code}
+      name: 부산교육청-행정 헬프센터
+      login-url: https://home.pen.go.kr/helpcenter/lo/login/loginTmpr.do
+      target-url: https://home.pen.go.kr/helpcenter/na/ntt/selectNttList.do?mi=14598&bbsId=4257
+      username: ${crawler.sites.busan-admin.username}
+      password: ${crawler.sites.busan-admin.password}
+    busan-main:
+      code: ${crawler.sites.busan-main.code}
+      name: 부산교육청-본청 헬프센터
+      login-url: https://www.pen.go.kr/common/lo/login/loginPage.do?retUrl=https%3A%2F%2Fwww.pen.go.kr%2Fhelp%2Fmain.do&retSysId=help
+      target-url: https://www.pen.go.kr/help/na/ntt/selectNttList.do?mi=30035&bbsId=2222
+      username: ${crawler.sites.busan-main.username}
+      password: ${crawler.sites.busan-main.password}
+    snue:
+      code: ${crawler.sites.snue.code}
+      name: 서울교대 헬프센터
+      login-url: https://www.snue.ac.kr/help/lo/login/loginPage.do
+      target-url: https://www.snue.ac.kr/help/na/ntt/selectNttList.do?mi=1386&bbsId=1113
+      username: ${crawler.sites.snue.username}
+      password: ${crawler.sites.snue.password}

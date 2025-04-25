@@ -6,6 +6,18 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 
+/**
+ * packageName    : com.helpcentercrawl.crawler.dto
+ * fileName       : CrawlResultDto
+ * author         : MinKyu Park
+ * date           : 2025-04-18
+ * description    : 크롤링 결과를 Redis에서 조회하기 위한 DTO
+ * ===========================================================
+ * DATE              AUTHOR             NOTE
+ * -----------------------------------------------------------
+ * 2025-04-18        MinKyu Park       최초 생성
+ */
+
 @Getter
 @NoArgsConstructor
 public class CrawlResultDto {

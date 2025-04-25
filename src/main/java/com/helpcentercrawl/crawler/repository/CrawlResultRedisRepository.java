@@ -15,6 +15,18 @@ import org.springframework.stereotype.Repository;
 import java.time.LocalDate;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * packageName    : com.helpcentercrawl.crawler.repository
+ * fileName       : CrawlResultRedisRepository
+ * author         : MinKyu Park
+ * date           : 25. 4. 21.
+ * description    : Redis의 데이터를 저장하고 조회하는 Repository
+ * ===========================================================
+ * DATE              AUTHOR             NOTE
+ * -----------------------------------------------------------
+ * 25. 4. 21.        MinKyu Park       최초 생성
+ */
+
 @Slf4j
 @Repository
 @RequiredArgsConstructor

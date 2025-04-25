@@ -11,6 +11,18 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 
+/**
+ * packageName    : com.helpcentercrawl.crawler.impl
+ * fileName       : BusanSchoolCrawler
+ * author         : MinKyu Park
+ * date           : 25. 4. 22.
+ * description    : 부산학교 지원센터 크롤러
+ * ===========================================================
+ * DATE              AUTHOR             NOTE
+ * -----------------------------------------------------------
+ * 25. 4. 22.        MinKyu Park       최초 생성
+ */
+
 @Slf4j
 @Component
 public class BusanSchoolCrawler extends AbstractCrawler {
@@ -31,62 +43,44 @@ public class BusanSchoolCrawler extends AbstractCrawler {
     }
 
     @Override
-    protected void login() throws InterruptedException {
-        // 로그인 페이지로 이동
+    protected void accessUrl() {
         driver.get(valueSettings.getBusanSchoolLoginUrl());
-        log.info("부산교육청-학교 헬프센터 로그인 페이지 접속 완료");
+    }
 
+    @Override
+    protected void accessLogin() {
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("mberId")));
+
+        WebElement idInput = driver.findElement(By.id("mberId"));
+        idInput.clear();
+        idInput.sendKeys(valueSettings.getBusanSchoolUsername());
+
+        WebElement pwInput = driver.findElement(By.id("mberPassword"));
+        pwInput.clear();
+        pwInput.sendKeys(valueSettings.getBusanSchoolPassword());
+
+        WebElement loginButton = driver.findElement(By.cssSelector("a.btn_login"));
+        loginButton.click();
+    }
+
+    @Override
+    protected void handlePopup() {
         try {
-            // 로그인 폼 요소들이 로드될 때까지 대기
-            wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("mberId")));
-
-            // 아이디 입력
-            WebElement idInput = driver.findElement(By.id("mberId"));
-            idInput.clear();
-            idInput.sendKeys(valueSettings.getBusanSchoolUsername());
-
-            // 비밀번호 입력
-            WebElement pwInput = driver.findElement(By.id("mberPassword"));
-            pwInput.clear();
-            pwInput.sendKeys(valueSettings.getBusanSchoolPassword());
-
-            // 로그인 버튼 클릭
-            WebElement loginButton = driver.findElement(By.cssSelector("a.btn_login"));
-            loginButton.click();
-
-            // 로그인 처리 대기
-            Thread.sleep(3000);
-
-            // 알림창이 뜨는지 확인 (로그인 성공 시 알림창이 표시됨)
-            try {
-                WebElement confirmButton = driver.findElement(By.cssSelector("button.btn_st.blue, button.확인"));
-                if (confirmButton.isDisplayed()) {
-                    confirmButton.click();
-                }
-            } catch (Exception e) {
-                log.debug("알림창이 표시되지 않았습니다: {}", e.getMessage());
+            WebElement confirmButton = driver.findElement(By.cssSelector("button.btn_st.blue, button.확인"));
+            if (confirmButton.isDisplayed()) {
+                confirmButton.click();
             }
-
-            log.info("부산교육청-학교 헬프센터 로그인 성공");
-
         } catch (Exception e) {
-            log.error("부산교육청-학교 헬프센터 로그인 중 오류 발생: {}", e.getMessage());
-            log.error("오류 상세 정보:", e);
-            throw e;
+            log.debug("알림창이 표시되지 않았습니다: {}", e.getMessage());
         }
     }
+
 
     @Override
     protected void navigateToTargetPage() {
         // 대상 페이지로 이동 (학교 수정요청 게시판)
         driver.get(valueSettings.getBusanSchoolSchoolTargetUrl());
         log.info("부산교육청-학교 수정요청 게시판 접속 완료");
-
-        // 페이지 로딩 대기
-        wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("table")));
-
-        // 페이지 완전 로딩 대기
-        waitForPageLoad();
     }
 
     @Override
@@ -97,12 +91,6 @@ public class BusanSchoolCrawler extends AbstractCrawler {
         // 유치원 수정요청 게시판으로 이동
         driver.get(valueSettings.getBusanSchoolKindergartenTargetUrl());
         log.info("부산교육청-유치원 수정요청 게시판 접속 완료");
-
-        // 페이지 로딩 대기
-        wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("table")));
-
-        // 페이지 완전 로딩 대기
-        waitForPageLoad();
 
         // 유치원 수정요청 게시판 처리
         processMultiplePages("table > tbody > tr");

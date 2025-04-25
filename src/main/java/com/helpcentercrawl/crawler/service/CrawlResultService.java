@@ -9,6 +9,18 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 
+/**
+ * packageName    : com.helpcentercrawl.crawler.service
+ * fileName       : CrawlResultService
+ * author         : MinKyu Park
+ * date           : 25. 4. 21.
+ * description    : 크롤링 결과를 Redis에 저장하고 조회하는 서비스
+ * ===========================================================
+ * DATE              AUTHOR             NOTE
+ * -----------------------------------------------------------
+ * 25. 4. 21.        MinKyu Park       최초 생성
+ */
+
 @Slf4j
 @Service
 @RequiredArgsConstructor

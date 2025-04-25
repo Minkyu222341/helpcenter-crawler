@@ -6,6 +6,18 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
+/**
+ * packageName    : com.helpcentercrawl.common.util
+ * fileName       : RedisUtil
+ * author         : MinKyu Park
+ * date           : 2025-04-18
+ * description    : Redis에서 객체를 조회하기 위한 유틸리티 클래스
+ * ===========================================================
+ * DATE              AUTHOR             NOTE
+ * -----------------------------------------------------------
+ * 2025-04-18        MinKyu Park       최초 생성
+ */
+
 @Component
 @RequiredArgsConstructor
 public class RedisUtil {
