@@ -1,6 +1,7 @@
 package com.helpcentercrawl.scheduler;
 
 import com.helpcentercrawl.crawler.interfaces.SiteCrawler;
+import com.helpcentercrawl.scheduler.config.SchedulerStatusManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -10,6 +11,7 @@ import java.util.List;
 
 /**
  * 주기적으로 크롤링을 실행하는 서비스
+ * 월-금요일, 08:00 ~ 18:00 사이에 3분마다 실행
  */
 @Slf4j
 @Service
@@ -17,12 +19,19 @@ import java.util.List;
 public class SchedulerService {
 
     private final List<SiteCrawler> crawlers;
+    private final SchedulerStatusManager statusManager;
 
     /**
-     * 30초마다 크롤링 실행
+     * 3분마다 크롤링 실행 (월-금요일, 08:00 ~ 18:00 사이에만)
      */
-    @Scheduled(fixedDelayString = "${scheduler.crawler.fixed-delay:30000}")
+    @Scheduled(cron = "${scheduler.crawler.fixed-delay}")
     public void runCrawlers() {
+
+        if (!statusManager.isSchedulingEnabled()) {
+            log.info("크롤링 스케줄링이 비활성화되어 있어 작업을 건너뜁니다.");
+            return;
+        }
+
         log.info("크롤링 시작: {} 개 사이트", crawlers.size());
 
         for (SiteCrawler crawler : crawlers) {

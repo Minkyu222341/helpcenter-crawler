@@ -5,11 +5,11 @@ chmod +x "$0"
 
 export SPRING_PROFILES_ACTIVE=dev
 
-if [ ! -f .env ]; then
+if [ ! -f .env.domain ]; then
     echo ".env 파일을 생성하고 필요한 환경변수를 설정해주세요."
     exit 1
 else
-    source .env
+    source .env.domain
 fi
 
 echo "애플리케이션 빌드 시작..."
