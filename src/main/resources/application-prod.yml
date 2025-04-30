@@ -12,7 +12,7 @@ scheduler:
 spring:
   datasource:
     url: ${spring.datasource.url:?DB URL이 설정되지 않았습니다. application-secret.yml이 올바르게 로드되었는지 확인하세요}
-    driver-class-name: com.mysql.cj.jdbc.Driver
+    driver-class-name: ${spring.datasource.driver-class-name:?DB 드라이버가 설정되지 않았습니다. application-secret.yml을 확인하세요}
     username: ${spring.datasource.username:?DB 사용자명이 설정되지 않았습니다. application-secret.yml을 확인하세요}
     password: ${spring.datasource.password:?DB 비밀번호가 설정되지 않았습니다. application-secret.yml을 확인하세요}
 
@@ -27,8 +27,8 @@ spring:
   # JPA 설정 추가
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: validate
     properties:
       hibernate:
-        dialect: org.hibernate.dialect.MySQL8Dialect
+        dialect: org.hibernate.dialect.OracleDialect
     open-in-view: false
