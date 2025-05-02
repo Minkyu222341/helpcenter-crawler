@@ -20,8 +20,8 @@ public class CorsConfig implements WebMvcConfigurer {
 
     @Override
     public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping("/api/**")
-                .allowedOriginPatterns("*")  // 모든 출처 패턴 허용
+        registry.addMapping("/**")
+                .allowedOrigins("http://dashboard.dev5.com", "http://helpcenter.dev5.com", "http://192.168.1.55:3000","http://localhost:3000")
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                 .allowedHeaders("*")
                 .allowCredentials(true);

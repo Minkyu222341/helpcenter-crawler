@@ -1,62 +1,45 @@
-version: '3.8'
-
 services:
   app:
     build: .
     container_name: helpcenter-crawler
     ports:
       - "8081:8081"
+    expose:
+      - "8081"
     environment:
-      - TZ=Asia/Seoul  # 한국 시간대 설정
+      - TZ=Asia/Seoul
       - SPRING_PROFILES_ACTIVE=prod,secret
-      # 데이터베이스 설정
-      - SPRING_DATASOURCE_URL=${MYSQL_URL}
-      - SPRING_DATASOURCE_USERNAME=${MYSQL_USER}
-      - SPRING_DATASOURCE_PASSWORD=${MYSQL_PASSWORD}
-      # Redis 설정
+
+      - SPRING_DATASOURCE_DRIVER_CLASS_NAME=${SPRING_DATASOURCE_DRIVER_CLASS_NAME}
+      - SPRING_DATASOURCE_URL=${SPRING_DATASOURCE_URL}
+      - SPRING_DATASOURCE_USERNAME=${SPRING_DATASOURCE_USERNAME}
+      - SPRING_DATASOURCE_PASSWORD=${SPRING_DATASOURCE_PASSWORD}
+
       - SPRING_REDIS_HOST=redis-main
       - SPRING_REDIS_PORT=6379
     restart: unless-stopped
     depends_on:
       redis-main:
-        condition: service_started # Redis 서비스가 시작된 후에 실행
-      mysql-db:
-        condition: service_healthy # 헬스체크 후 실행
+        condition: service_started
+    networks:
+      - helpcenter-network
 
-  # Redis 설정
   redis-main:
-    image: redis:latest # Redis 최신 버전 사용
-    container_name: redis-main # Redis 컨테이너 이름
+    image: redis:latest
+    container_name: redis-main
     environment:
-      - TZ=Asia/Seoul  # 한국 시간대 설정
+      - TZ=Asia/Seoul
     ports:
       - "6379:6379"
-    restart: unless-stopped # 컨테이너가 중지되면 자동으로 재시작
+    restart: unless-stopped
     volumes:
       - redis-data:/data
-
-  # MySQL 설정
-  mysql-db:
-    image: mysql:8.0
-    container_name: helpcenter-mysql-db # MySQL 컨테이너 이름
-    environment:
-      - TZ=Asia/Seoul  # 한국 시간대 설정
-      - MYSQL_DATABASE=helpcenter # 데이터베이스 이름
-      - MYSQL_USER=${MYSQL_USER} # 사용자
-      - MYSQL_PASSWORD=${MYSQL_PASSWORD} # 비밀번호
-      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD} # 루트 비밀번호
-    ports:
-      - "3306:3306"
-    volumes:
-      - mysql-data:/var/lib/mysql
-    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
-    restart: unless-stopped # 컨테이너가 중지되면 자동으로 재시작
-    healthcheck:
-      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
-      interval: 5s
-      timeout: 10s
-      retries: 10
+    networks:
+      - helpcenter-network
 
 volumes:
   redis-data:
-  mysql-data:
+
+networks:
+  helpcenter-network:
+    driver: bridge

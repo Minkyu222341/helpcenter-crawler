@@ -27,7 +27,12 @@ spring:
 # 크롤링 실행 주기 설정 (ms 단위)
 scheduler:
   crawler:
-    fixed-delay: 30000  # 30초
+    cron: "0 * * * * *"  # 매 분
   # 데이터 마이그레이션 스케줄러 설정 추가
   migration:
     cron: "0 * * * * ?"  # 매 분마다 실행
+
+
+logging:
+  level:
+    root: ERROR

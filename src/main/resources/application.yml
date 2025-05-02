@@ -1,6 +1,6 @@
 spring:
   profiles:
-    include: secret
+    include: prod, secret
   task:
     scheduling:
       pool:

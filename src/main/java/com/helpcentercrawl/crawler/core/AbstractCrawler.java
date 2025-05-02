@@ -84,17 +84,14 @@ public abstract class AbstractCrawler implements SiteCrawler {
             // 4. 페이지에서 데이터 추출 및 처리
             processPageData();
 
-            // 5. 결과 출력
-            printResults();
-
-            // 6. Redis에 크롤링 결과 저장
+            // 5. Redis에 크롤링 결과 저장
             saveCrawlResultToRedis();
 
         } catch (Exception e) {
             log.error("크롤링 중 오류 발생: {}", e.getMessage());
             log.error("오류 상세 정보:", e);
         } finally {
-            // 7. 리소스 정리
+            // 6. 리소스 정리
             cleanup();
         }
     }
@@ -375,16 +372,6 @@ public abstract class AbstractCrawler implements SiteCrawler {
         }
 
         return false;
-    }
-
-    /**
-     * 결과 출력 메서드
-     */
-    protected void printResults() {
-        System.out.println("\n===== " + getSiteName() + " 오늘 요청 통계 =====");
-        System.out.println("오늘 들어온 요청의 개수: " + todayTotal.get() + "건");
-        System.out.println("완료처리된 개수: " + todayCompleted.get() + "건");
-        System.out.println("완료처리가 아닌 개수: " + todayNotCompleted.get() + "건");
     }
 
     /**

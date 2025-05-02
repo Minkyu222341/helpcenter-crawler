@@ -4,15 +4,16 @@ server:
 # 크롤링 실행 주기 설정 (ms 단위)
 scheduler:
   crawler:
-    fixed-delay: 180000  # 3분 (180,000밀리초)
+    cron: 0 0/3 8-18 * * MON-FRI  # 월요일 ~ 금요일 08시 부터 18시까지 3분마다 실행
+#    cron: "0 * * * * *"  # 매 분
   migration:
-    cron: "0 0 22 * * ?"  # 매일 오후 10시에 실행
+    cron: "0 0 19 * * MON-FRI" # 월-금 오후 7시
 
 
 spring:
   datasource:
     url: ${spring.datasource.url:?DB URL이 설정되지 않았습니다. application-secret.yml이 올바르게 로드되었는지 확인하세요}
-    driver-class-name: com.mysql.cj.jdbc.Driver
+    driver-class-name: ${spring.datasource.driver-class-name:?DB 드라이버가 설정되지 않았습니다. application-secret.yml을 확인하세요}
     username: ${spring.datasource.username:?DB 사용자명이 설정되지 않았습니다. application-secret.yml을 확인하세요}
     password: ${spring.datasource.password:?DB 비밀번호가 설정되지 않았습니다. application-secret.yml을 확인하세요}
 
@@ -27,8 +28,12 @@ spring:
   # JPA 설정 추가
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: validate
     properties:
       hibernate:
-        dialect: org.hibernate.dialect.MySQL8Dialect
+        dialect: org.hibernate.dialect.OracleDialect
     open-in-view: false
+
+logging:
+  level:
+    root: ERROR
