@@ -25,8 +25,11 @@ public class SchedulerStatusManager {
      * 스케줄링 상태 변경
      * @param enabled 활성화 여부
      */
-    public void setSchedulingEnabled(boolean enabled) {
+    public boolean toggleSchedulingEnabled(boolean enabled) {
         this.schedulingEnabled = enabled;
         log.info("크롤링 스케줄링 상태가 {}으로 변경되었습니다.", enabled ? "활성화" : "비활성화");
+
+        return schedulingEnabled;
     }
+
 }

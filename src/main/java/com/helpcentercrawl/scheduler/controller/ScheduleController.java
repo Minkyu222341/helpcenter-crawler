@@ -1,13 +1,12 @@
 package com.helpcentercrawl.scheduler.controller;
 
-import com.helpcentercrawl.scheduler.config.SchedulerStatusManager;
+import com.helpcentercrawl.scheduler.dto.SchedulerStatusRequest;
+import com.helpcentercrawl.scheduler.dto.SchedulerStatusResponse;
+import com.helpcentercrawl.scheduler.service.SchedulerService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * packageName    : com.helpcentercrawl.scheduler.controller
@@ -20,31 +19,34 @@ import java.util.Map;
  * -----------------------------------------------------------
  * 25. 4. 28.        MinKyu Park       최초 생성
  */
+@Slf4j
 @RestController
 @RequestMapping("/api/v1/schedule")
-@Slf4j
+@RequiredArgsConstructor
 public class ScheduleController {
-    private final SchedulerStatusManager statusManager;
+    private final SchedulerService schedulerService;
 
-    @Autowired
-    public ScheduleController(SchedulerStatusManager statusManager) {
-        this.statusManager = statusManager;
-    }
 
+    /**
+     * 현재 스케줄러의 활성화 상태를 조회합니다.
+     * @return 현재 스케줄러 상태 정보를 포함한 ResponseEntity
+     */
     @GetMapping("/status")
-    public ResponseEntity<Map<String, Boolean>> getScheduleStatus() {
-        Map<String, Boolean> response = new HashMap<>();
-        response.put("status", statusManager.isSchedulingEnabled());
-        return ResponseEntity.ok(response);
+    public ResponseEntity<SchedulerStatusResponse> getScheduleStatus() {
+
+        return ResponseEntity.ok(schedulerService.getSchedulerStatus());
     }
 
+    /**
+     * 스케줄러의 활성화 상태를 제어합니다.
+     *
+     * @param request 상태 변경 요청 정보 (status: true/false)
+     * @return 변경된 스케줄러 상태 정보를 포함한 ResponseEntity
+     */
     @PostMapping("/control")
-    public ResponseEntity<Map<String, Boolean>> controlSchedule(@RequestBody Map<String, Boolean> request) {
-        boolean enabled = request.get("status");
-        statusManager.setSchedulingEnabled(enabled);
+    public ResponseEntity<SchedulerStatusResponse> controlSchedule(@RequestBody SchedulerStatusRequest request) {
 
-        Map<String, Boolean> response = new HashMap<>();
-        response.put("status", statusManager.isSchedulingEnabled());
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(schedulerService.controlSchedulerStatus(request));
     }
+
 }
