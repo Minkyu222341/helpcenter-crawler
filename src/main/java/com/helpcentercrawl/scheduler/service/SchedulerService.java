@@ -42,7 +42,7 @@ public class SchedulerService {
             throw new IllegalArgumentException("상태 값은 필수입니다");
         }
 
-        boolean currentStatus = statusManager.toggleSchedulingEnabled(status);
+        boolean currentStatus = statusManager.setSchedulingEnabled(status);
 
         return SchedulerStatusResponse.toResponse(currentStatus);
     }
