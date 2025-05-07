@@ -2,11 +2,10 @@ package com.helpcentercrawl.crawler.impl;
 
 import com.helpcentercrawl.common.config.CrawlerValueSettings;
 import com.helpcentercrawl.crawler.core.AbstractCrawler;
+import com.helpcentercrawl.crawler.model.LoginModel;
 import com.helpcentercrawl.crawler.service.CrawlResultService;
 import lombok.extern.slf4j.Slf4j;
-import org.openqa.selenium.By;
 import org.openqa.selenium.TimeoutException;
-import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.stereotype.Component;
@@ -33,22 +32,21 @@ public class BusanAdminCrawler extends AbstractCrawler {
     }
 
     @Override
-    protected void accessUrl() {
-        driver.get(valueSettings.getBusanAdminLoginUrl());
+    protected LoginModel getLoginModel() {
+        return LoginModel.builder()
+                .idFieldId("mberId")
+                .pwFieldId("mberPassword")
+                .loginButtonSelector("a.btn[onclick*='login()']")
+                .username(valueSettings.getBusanAdminUsername())
+                .password(valueSettings.getBusanAdminPassword())
+                .jsLogin(false)
+                .successCondition(ExpectedConditions.urlContains("main"))
+                .build();
     }
 
     @Override
-    protected void accessLogin() {
-        WebElement idInput = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("mberId")));
-        idInput.clear();
-        idInput.sendKeys(valueSettings.getBusanAdminUsername());
-
-        WebElement pwInput = driver.findElement(By.id("mberPassword"));
-        pwInput.clear();
-        pwInput.sendKeys(valueSettings.getBusanAdminPassword());
-
-        WebElement loginButton = wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("a.btn[onclick*='login()']")));
-        loginButton.click();
+    protected void accessUrl() {
+        driver.get(valueSettings.getBusanAdminLoginUrl());
     }
 
     @Override
@@ -66,7 +64,6 @@ public class BusanAdminCrawler extends AbstractCrawler {
     @Override
     protected void navigateToTargetPage() {
         driver.get(valueSettings.getBusanAdminTargetUrl());
-
         log.info("부산행정 헬프센터 접속 완료");
     }
 
