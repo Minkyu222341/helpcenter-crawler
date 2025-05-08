@@ -84,4 +84,9 @@ public class BusanMainCrawler extends AbstractCrawler {
     public String getSiteCode() {
         return valueSettings.getBusanMainCode();
     }
+
+    @Override
+    public Integer getSequence() {
+        return 3;
+    }
 }

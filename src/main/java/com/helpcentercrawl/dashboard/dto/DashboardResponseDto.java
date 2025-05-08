@@ -12,6 +12,7 @@ public class DashboardResponseDto {
     private Integer completedCount;
     private Integer notCompletedCount;
     private Integer totalCount;
+    private Integer sequence;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime lastUpdatedAt;
 }

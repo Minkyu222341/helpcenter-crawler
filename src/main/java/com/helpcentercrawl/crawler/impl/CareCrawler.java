@@ -69,4 +69,9 @@ public class CareCrawler extends AbstractCrawler {
     public String getSiteCode() {
         return valueSettings.getCareCode();
     }
+
+    @Override
+    public Integer getSequence() {
+        return 9;
+    }
 }

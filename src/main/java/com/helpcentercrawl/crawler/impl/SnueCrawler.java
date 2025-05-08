@@ -77,4 +77,9 @@ public class SnueCrawler extends AbstractCrawler {
     public String getSiteCode() {
         return valueSettings.getSnueCode();
     }
+
+    @Override
+    public Integer getSequence() {
+        return 8;
+    }
 }

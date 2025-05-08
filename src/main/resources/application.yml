@@ -12,21 +12,21 @@ crawler:
   sites:
     gne:
       code: ${crawler.sites.gne.code}
-      name: 경상남도교육청
+      name: 경남행정
       login-url: https://service.gne.go.kr/helpcenter/main.do
       target-url: https://service.gne.go.kr/helpcenter/na/ntt/selectNttList.do?mi=7849&bbsId=2265
       username: ${crawler.sites.gne.username}
       password: ${crawler.sites.gne.password}
     changwon:
       code: ${crawler.sites.changwon.code}
-      name: 창원대학교
+      name: 창원대
       login-url: https://www.changwon.ac.kr/helpcenter/lo/login/loginPage.do
       target-url: https://www.changwon.ac.kr/helpcenter/na/ntt/selectNttList.do?mi=13160&bbsId=3308
       username: ${crawler.sites.changwon.username}
       password: ${crawler.sites.changwon.password}
     busan-school:
       code: ${crawler.sites.busan-school.code}
-      name: 부산교육청-학교
+      name: 부산학교
       login-url: https://school.busanedu.net/help/lo/login/loginPage.do
       school-target-url: https://school.busanedu.net/help/na/ntt/selectNttList.do?mi=2344&bbsId=5048088
       kindergarten-target-url: https://school.busanedu.net/help/na/ntt/selectNttList.do?mi=1854&bbsId=3000410
@@ -34,14 +34,14 @@ crawler:
       password: ${crawler.sites.busan-school.password}
     busan-admin:
       code: ${crawler.sites.busan-admin.code}
-      name: 부산교육청-행정
+      name: 부산행정
       login-url: https://home.pen.go.kr/helpcenter/lo/login/loginTmpr.do
       target-url: https://home.pen.go.kr/helpcenter/na/ntt/selectNttList.do?mi=14598&bbsId=4257
       username: ${crawler.sites.busan-admin.username}
       password: ${crawler.sites.busan-admin.password}
     busan-main:
       code: ${crawler.sites.busan-main.code}
-      name: 부산교육청-본청
+      name: 부산본청
       login-url: https://www.pen.go.kr/common/lo/login/loginPage.do?retUrl=https%3A%2F%2Fwww.pen.go.kr%2Fhelp%2Fmain.do&retSysId=help
       target-url: https://www.pen.go.kr/help/na/ntt/selectNttList.do?mi=30035&bbsId=2222
       username: ${crawler.sites.busan-main.username}
@@ -55,7 +55,7 @@ crawler:
       password: ${crawler.sites.snue.password}
     gnu:
       code: ${crawler.sites.gnu.code}
-      name: 경상국립대학교
+      name: 경상대
       login-url: https://www.gnu.ac.kr/main/lo/login/loginPage.do
       main-target-url: https://www.gnu.ac.kr/him/na/ntt/selectNttList.do?mi=11547&bbsId=2889
       sub-target-url: https://www.gnu.ac.kr/him/na/ntt/selectNttList.do?mi=9137&bbsId=2890
@@ -63,14 +63,14 @@ crawler:
       password: ${crawler.sites.gnu.password}
     kmou:
       code: ${crawler.sites.kmou.code}
-      name: 해양대학교
+      name: 해양대
       login-url: https://www.kmou.ac.kr/kmou/lo/login/loginPage.do?mi=3510
       target-url: https://www.kmou.ac.kr/apple/na/ntt/selectNttList.do?bbsId=10000654&mi=3080
       username: ${crawler.sites.kmou.username}
       password: ${crawler.sites.kmou.password}
     care:
       code: ${crawler.sites.care.code}
-      name: 늘봄학교 서비스
+      name: 늘봄서비스
       login-url: https://care.pen.go.kr/common/lo/login/loginPage.do?retUrl=https%3A%2F%2Fcare.pen.go.kr%2Fhelp%2Fmain.do&retSysId=help
       target-url: https://care.pen.go.kr/help/na/ntt/selectNttList.do?mi=33070&bbsId=3707
       username: ${crawler.sites.care.username}

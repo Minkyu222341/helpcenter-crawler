@@ -47,6 +47,11 @@ public class GneCrawler extends AbstractCrawler {
     }
 
     @Override
+    public Integer getSequence() {
+        return 4;
+    }
+
+    @Override
     protected void accessUrl() {
         // 로그인 URL 직접 접근
         driver.get(valueSettings.getGneLoginUrl());

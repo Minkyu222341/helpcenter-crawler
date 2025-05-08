@@ -123,4 +123,9 @@ public class BusanSchoolCrawler extends AbstractCrawler {
     public String getSiteCode() {
         return valueSettings.getBusanSchoolCode();
     }
+
+    @Override
+    public Integer getSequence() {
+        return 1;
+    }
 }

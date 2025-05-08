@@ -81,4 +81,9 @@ public class BusanAdminCrawler extends AbstractCrawler {
     public String getSiteCode() {
         return valueSettings.getBusanAdminCode();
     }
+
+    @Override
+    public Integer getSequence() {
+        return 2;
+    }
 }

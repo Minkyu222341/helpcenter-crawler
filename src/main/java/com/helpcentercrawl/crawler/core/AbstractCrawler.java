@@ -421,6 +421,7 @@ public abstract class AbstractCrawler implements SiteCrawler {
                     .notCompletedCount(todayNotCompleted.get())
                     .totalCount(todayTotal.get())
                     .crawlDate(today)
+                    .sequence(getSequence())
                     .lastUpdatedAt(lastUpdatedTime)
                     .build();
 
