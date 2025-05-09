@@ -41,8 +41,8 @@ public class GnuCrawler extends AbstractCrawler {
                 .idFieldId("mberId")
                 .pwFieldId("mberPassword")
                 .loginButtonSelector("a.btn_login")
-                .username(valueSettings.getCareUsername())
-                .password(valueSettings.getCarePassword())
+                .username(valueSettings.getGnuUsername())
+                .password(valueSettings.getGnuPassword())
                 .jsLogin(false)
                 .successCondition(ExpectedConditions.urlContains("main"))
                 .build();
