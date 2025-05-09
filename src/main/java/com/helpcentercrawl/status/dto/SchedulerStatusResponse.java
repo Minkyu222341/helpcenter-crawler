@@ -1,11 +1,11 @@
-package com.helpcentercrawl.scheduler.dto;
+package com.helpcentercrawl.status.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 
 /**
  * packageName    : com.helpcentercrawl.scheduler.dto
- * fileName       : SchedulerStatusRequest
+ * fileName       : SchedulerStatusResponse
  * author         : MinKyu Park
  * date           : 25. 5. 2.
  * description    :
@@ -15,7 +15,12 @@ import lombok.NoArgsConstructor;
  * 25. 5. 2.        MinKyu Park       최초 생성
  */
 @Getter
-@NoArgsConstructor
-public class SchedulerStatusRequest {
-    private Boolean status;
+@AllArgsConstructor
+public class SchedulerStatusResponse {
+    private boolean status;
+
+
+    public static SchedulerStatusResponse toResponse(boolean currentStatus) {
+        return new SchedulerStatusResponse(currentStatus);
+    }
 }

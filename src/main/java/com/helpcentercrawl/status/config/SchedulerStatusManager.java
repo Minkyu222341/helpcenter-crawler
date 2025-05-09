@@ -1,4 +1,4 @@
-package com.helpcentercrawl.scheduler.config;
+package com.helpcentercrawl.status.config;
 
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
