@@ -5,35 +5,30 @@ import com.helpcentercrawl.crawler.core.AbstractCrawler;
 import com.helpcentercrawl.crawler.model.LoginModel;
 import com.helpcentercrawl.crawler.service.CrawlResultService;
 import lombok.extern.slf4j.Slf4j;
-import org.openqa.selenium.By;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.springframework.stereotype.Component;
 
 /**
  * packageName    : com.helpcentercrawl.crawler.impl
- * fileName       : ChangwonCrawler
+ * fileName       : CareCrawler
  * author         : MinKyu Park
- * date           : 25. 4. 22.
- * description    : 창원대 지원센터 크롤러
+ * date           : 25. 5. 7.
+ * description    : 늘봄학교 서비스 지원센터 크롤러
  * ===========================================================
  * DATE              AUTHOR             NOTE
  * -----------------------------------------------------------
- * 25. 4. 22.        MinKyu Park       최초 생성
+ * 25. 5. 7.        MinKyu Park       최초 생성
  */
-
 @Slf4j
 @Component
-public class ChangwonCrawler extends AbstractCrawler {
-
-
-    public ChangwonCrawler(CrawlResultService crawlResultService, CrawlerValueSettings valueSettings) {
+public class CareCrawler extends AbstractCrawler {
+    public CareCrawler(CrawlResultService crawlResultService, CrawlerValueSettings valueSettings) {
         super(crawlResultService, valueSettings);
     }
 
-
     @Override
     protected void accessUrl() {
-        driver.get(valueSettings.getChangwonLoginUrl());
+        driver.get(valueSettings.getCareLoginUrl());
     }
 
     @Override
@@ -41,44 +36,42 @@ public class ChangwonCrawler extends AbstractCrawler {
         return LoginModel.builder()
                 .idFieldId("mberId")
                 .pwFieldId("mberPassword")
-                .loginButtonSelector("a.btn_Login")
-                .username(valueSettings.getChangwonUsername())
-                .password(valueSettings.getChangwonPassword())
+                .loginButtonSelector("button.btnLogin")
+                .username(valueSettings.getCareUsername())
+                .password(valueSettings.getCarePassword())
                 .jsLogin(false)
-                .successCondition(ExpectedConditions.urlContains("update"))
+                .successCondition(ExpectedConditions.urlContains("main"))
                 .build();
     }
 
     @Override
-    protected void handlePopup() {
-    }
+    protected void handlePopup() throws InterruptedException {
 
+    }
 
     @Override
     protected void navigateToTargetPage() {
-        driver.get(valueSettings.getChangwonTargetUrl());
-        log.info("창원 헬프센터 접속 완료");
+        driver.get(valueSettings.getCareTargetUrl());
+        log.info("늘봄학교 서비스 헬프센터 접속 완료");
     }
 
     @Override
     protected void processPageData() throws InterruptedException {
-        wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("table#nttTable > tbody > tr")));
-
-        processMultiplePages("table#nttTable > tbody > tr");
+        processMultiplePages("table > tbody > tr");
     }
 
     @Override
     public String getSiteName() {
-        return valueSettings.getChangwonName();
+        return valueSettings.getCareName();
     }
 
     @Override
     public String getSiteCode() {
-        return valueSettings.getChangwonCode();
+        return valueSettings.getCareCode();
     }
 
     @Override
     public Integer getSequence() {
-        return 5;
+        return 9;
     }
 }

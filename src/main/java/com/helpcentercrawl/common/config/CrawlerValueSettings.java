@@ -97,4 +97,48 @@ public class CrawlerValueSettings {
     @Value("${crawler.sites.busan-main.password}")
     private String busanMainPassword;
 
+
+    //경상국립대 사이트 설정
+    @Value("${crawler.sites.gnu.code}")
+    private String gnuCode;
+    @Value("${crawler.sites.gnu.name}")
+    private String gnuName;
+    @Value("${crawler.sites.gnu.login-url}")
+    private String gnuLoginUrl;
+    @Value("${crawler.sites.gnu.main-target-url}")
+    private String gnuMainTargetUrl;
+    @Value("${crawler.sites.gnu.sub-target-url}")
+    private String gnuSubTargetUrl;
+    @Value("${crawler.sites.gnu.username}")
+    private String gnuUsername;
+    @Value("${crawler.sites.gnu.password}")
+    private String gnuPassword;
+
+    //해양대학교 사이트 설정
+    @Value("${crawler.sites.kmou.code}")
+    private String kmouCode;
+    @Value("${crawler.sites.kmou.name}")
+    private String kmouName;
+    @Value("${crawler.sites.kmou.login-url}")
+    private String kmouLoginUrl;
+    @Value("${crawler.sites.kmou.target-url}")
+    private String kmouTargetUrl;
+    @Value("${crawler.sites.kmou.username}")
+    private String kmouUsername;
+    @Value("${crawler.sites.kmou.password}")
+    private String kmouPassword;
+
+    //늘봄학교 서비스 사이트 설정
+    @Value("${crawler.sites.care.code}")
+    private String careCode;
+    @Value("${crawler.sites.care.name}")
+    private String careName;
+    @Value("${crawler.sites.care.login-url}")
+    private String careLoginUrl;
+    @Value("${crawler.sites.care.target-url}")
+    private String careTargetUrl;
+    @Value("${crawler.sites.care.username}")
+    private String careUsername;
+    @Value("${crawler.sites.care.password}")
+    private String carePassword;
 }

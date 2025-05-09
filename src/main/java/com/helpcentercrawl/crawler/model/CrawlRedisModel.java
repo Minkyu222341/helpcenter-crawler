@@ -30,20 +30,21 @@ public class CrawlRedisModel {
     private Integer notCompletedCount;
     private Integer totalCount;
     private LocalDate crawlDate;
+    private Integer sequence;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime lastUpdatedAt;
 
     @Builder
-    public CrawlRedisModel(String siteCode, String siteName, Integer completedCount, Integer notCompletedCount, Integer totalCount, LocalDate crawlDate, LocalDateTime lastUpdatedAt) {
+    public CrawlRedisModel(String siteCode, String siteName, Integer completedCount, Integer notCompletedCount, Integer totalCount, LocalDate crawlDate, Integer sequence, LocalDateTime lastUpdatedAt) {
         this.siteCode = siteCode;
         this.siteName = siteName;
         this.completedCount = completedCount;
         this.notCompletedCount = notCompletedCount;
         this.totalCount = totalCount;
         this.crawlDate = crawlDate;
+        this.sequence = sequence;
         this.lastUpdatedAt = lastUpdatedAt;
     }
-
 
     public static CrawlRedisModel fromSaveDto(CrawlSaveDto dto) {
         return CrawlRedisModel.builder()
@@ -53,6 +54,7 @@ public class CrawlRedisModel {
                 .notCompletedCount(dto.getNotCompletedCount())
                 .totalCount(dto.getTotalCount())
                 .crawlDate(dto.getCrawlDate())
+                .sequence(dto.getSequence())
                 .lastUpdatedAt(dto.getLastUpdatedAt())
                 .build();
     }
@@ -64,6 +66,7 @@ public class CrawlRedisModel {
                 .completedCount(this.completedCount)
                 .notCompletedCount(this.notCompletedCount)
                 .totalCount(this.totalCount)
+                .sequence(this.sequence)
                 .crawlDate(this.crawlDate)
                 .build();
     }

@@ -2,13 +2,17 @@ package com.helpcentercrawl.crawler.impl;
 
 import com.helpcentercrawl.common.config.CrawlerValueSettings;
 import com.helpcentercrawl.crawler.core.AbstractCrawler;
+import com.helpcentercrawl.crawler.model.LoginModel;
 import com.helpcentercrawl.crawler.service.CrawlResultService;
 import lombok.extern.slf4j.Slf4j;
 import org.openqa.selenium.By;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.stereotype.Component;
 
+import java.time.Duration;
 import java.util.List;
 
 /**
@@ -33,79 +37,60 @@ public class BusanSchoolCrawler extends AbstractCrawler {
     }
 
     @Override
-    public String getSiteName() {
-        return valueSettings.getBusanSchoolName();
-    }
-
-    @Override
-    public String getSiteCode() {
-        return valueSettings.getBusanSchoolCode();
-    }
-
-    @Override
     protected void accessUrl() {
         driver.get(valueSettings.getBusanSchoolLoginUrl());
     }
 
     @Override
-    protected void accessLogin() {
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("mberId")));
-
-        WebElement idInput = driver.findElement(By.id("mberId"));
-        idInput.clear();
-        idInput.sendKeys(valueSettings.getBusanSchoolUsername());
-
-        WebElement pwInput = driver.findElement(By.id("mberPassword"));
-        pwInput.clear();
-        pwInput.sendKeys(valueSettings.getBusanSchoolPassword());
-
-        WebElement loginButton = driver.findElement(By.cssSelector("a.btn_login"));
-        loginButton.click();
+    protected LoginModel getLoginModel() {
+        return LoginModel.builder()
+                .idFieldId("mberId")
+                .pwFieldId("mberPassword")
+                .loginButtonSelector("a.btn_login")
+                .username(valueSettings.getBusanSchoolUsername())
+                .password(valueSettings.getBusanSchoolPassword())
+                .jsLogin(false)
+                .successCondition(ExpectedConditions.urlContains("main"))
+                .build();
     }
 
     @Override
     protected void handlePopup() {
         try {
-            WebElement confirmButton = driver.findElement(By.cssSelector("button.btn_st.blue, button.확인"));
-            if (confirmButton.isDisplayed()) {
-                confirmButton.click();
-            }
-        } catch (Exception e) {
-            log.debug("알림창이 표시되지 않았습니다: {}", e.getMessage());
+            WebDriverWait alertWait = new WebDriverWait(driver, Duration.ofSeconds(3));
+            alertWait.until(ExpectedConditions.alertIsPresent());
+
+            driver.switchTo().alert().accept();
+        } catch (TimeoutException e) {
+            log.info("Alert 창이 나타나지 않았습니다.");
         }
     }
 
 
     @Override
     protected void navigateToTargetPage() {
-        // 대상 페이지로 이동 (학교 수정요청 게시판)
         driver.get(valueSettings.getBusanSchoolSchoolTargetUrl());
         log.info("부산교육청-학교 수정요청 게시판 접속 완료");
     }
 
     @Override
     protected void processPageData() {
-        // 현재 페이지 처리 (학교 수정요청 게시판)
         processMultiplePages("table > tbody > tr");
 
-        // 유치원 수정요청 게시판으로 이동
         driver.get(valueSettings.getBusanSchoolKindergartenTargetUrl());
         log.info("부산교육청-유치원 수정요청 게시판 접속 완료");
 
-        // 유치원 수정요청 게시판 처리
         processMultiplePages("table > tbody > tr");
     }
 
     @Override
     protected boolean isCompleted(WebElement row) {
         try {
-            // 완료 상태 확인 (이미지를 통해 확인)
             List<WebElement> images = row.findElements(By.cssSelector("img[src*='btn_comp']"));
             if (!images.isEmpty()) {
                 return true;
             }
 
-            // 텍스트로 완료 상태 확인
             String rowText = row.getText();
             return rowText.contains("완료");
         } catch (Exception e) {
@@ -118,7 +103,6 @@ public class BusanSchoolCrawler extends AbstractCrawler {
     @Override
     protected String extractDateText(WebElement row) {
         try {
-            // 날짜 셀 가져오기 (4번째 td가 날짜)
             List<WebElement> cells = row.findElements(By.tagName("td"));
             if (cells.size() >= 4) {
                 return cells.get(3).getText().trim();
@@ -128,5 +112,20 @@ public class BusanSchoolCrawler extends AbstractCrawler {
         }
 
         return "";
+    }
+
+    @Override
+    public String getSiteName() {
+        return valueSettings.getBusanSchoolName();
+    }
+
+    @Override
+    public String getSiteCode() {
+        return valueSettings.getBusanSchoolCode();
+    }
+
+    @Override
+    public Integer getSequence() {
+        return 1;
     }
 }

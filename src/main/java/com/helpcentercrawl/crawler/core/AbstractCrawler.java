@@ -4,13 +4,11 @@ import com.helpcentercrawl.common.config.CrawlerValueSettings;
 import com.helpcentercrawl.crawler.dto.CrawlResultDto;
 import com.helpcentercrawl.crawler.dto.CrawlSaveDto;
 import com.helpcentercrawl.crawler.interfaces.SiteCrawler;
+import com.helpcentercrawl.crawler.model.LoginModel;
 import com.helpcentercrawl.crawler.service.CrawlResultService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.openqa.selenium.By;
-import org.openqa.selenium.PageLoadStrategy;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -60,7 +58,6 @@ public abstract class AbstractCrawler implements SiteCrawler {
      */
     @Override
     public final void crawl() {
-        // 크롤링 시작 전 초기화
         todayTotal.set(0);
         todayCompleted.set(0);
         todayNotCompleted.set(0);
@@ -91,7 +88,6 @@ public abstract class AbstractCrawler implements SiteCrawler {
             log.error("크롤링 중 오류 발생: {}", e.getMessage());
             log.error("오류 상세 정보:", e);
         } finally {
-            // 6. 리소스 정리
             cleanup();
         }
     }
@@ -102,7 +98,6 @@ public abstract class AbstractCrawler implements SiteCrawler {
     protected void initializeWebDriver() {
         ChromeOptions options = getChromeOptions();
 
-        // 성능 매개변수 설정
         Map<String, Object> prefs = new HashMap<>();
         prefs.put("profile.default_content_setting_values.notifications", 2);
         prefs.put("profile.default_content_setting_values.images", 2);
@@ -135,14 +130,16 @@ public abstract class AbstractCrawler implements SiteCrawler {
      * 로그인 처리 메서드
      */
     protected void login() {
-
         try {
             accessUrl();
-            Thread.sleep(1000);
-            accessLogin();
-            Thread.sleep(1000);
-            handlePopup();
-            Thread.sleep(1000);
+
+            LoginModel loginModel = getLoginModel();
+
+            if (loginModel.isJsLogin()) {
+                jsLogin(loginModel);
+            } else {
+                standardLogin(loginModel);
+            }
 
             log.info("{} 로그인 성공", getSiteName());
         } catch (Exception e) {
@@ -150,16 +147,57 @@ public abstract class AbstractCrawler implements SiteCrawler {
             throw new RuntimeException("로그인 실패", e);
         }
     }
+    /**
+     * 표준 로그인 수행 메서드
+     */
+    private void standardLogin(LoginModel loginModel) throws InterruptedException {
+        WebElement idInput = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id(loginModel.getIdFieldId())));
+        idInput.clear();
+        idInput.sendKeys(loginModel.getUsername());
+
+        WebElement pwInput = driver.findElement(By.id(loginModel.getPwFieldId()));
+        pwInput.clear();
+        pwInput.sendKeys(loginModel.getPassword());
+
+        WebElement loginButton = wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector(loginModel.getLoginButtonSelector())));
+        loginButton.click();
+
+        handlePopup();
+
+        wait.until(loginModel.getSuccessCondition());
+    }
+
+    /**
+     * JavaScript 기반 로그인 수행 메서드 (해양대학교)
+     */
+    private void jsLogin(LoginModel loginModel) throws InterruptedException {
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.id(loginModel.getIdFieldId())));
+
+        WebElement idInput = driver.findElement(By.id(loginModel.getIdFieldId()));
+        idInput.clear();
+        idInput.sendKeys(loginModel.getUsername());
+
+        WebElement pwInput = driver.findElement(By.id(loginModel.getPwFieldId()));
+        JavascriptExecutor js = (JavascriptExecutor) driver;
+        js.executeScript("arguments[0].value = arguments[1];", pwInput, loginModel.getPassword());
+
+        js.executeScript(loginModel.getJsLoginScript());
+
+        handlePopup();
+
+        // 로그인 성공 조건 대기
+        wait.until(loginModel.getSuccessCondition());
+    }
+
+    /**
+     * 로그인 설정 가져오기 (각 크롤러에서 구현)
+     */
+    protected abstract LoginModel getLoginModel();
 
     /**
      * 로그인 URL 접근 메서드
      */
     protected abstract void accessUrl();
-
-    /**
-     * 로그인 처리 메서드
-     */
-    protected abstract void accessLogin() throws InterruptedException;
 
     /**
      * 팝업 처리 메서드
@@ -183,11 +221,10 @@ public abstract class AbstractCrawler implements SiteCrawler {
      * @param tableSelector 테이블 행 선택자
      */
     protected void processMultiplePages(String tableSelector) {
-        // 페이지네이션 탐색
         int maxPages = getMaxPagesCount();
 
-        // 각 페이지 탐색 현재 5페이지까지만 탐색
-        for (int currentPage = 1; currentPage <= Math.min(maxPages, 5); currentPage++) {
+        // 각 페이지 탐색 현재 3페이지까지만 탐색
+        for (int currentPage = 1; currentPage <= Math.min(maxPages, 3); currentPage++) {
             if (currentPage > 1) {
                 navigateToPage(currentPage);
             }
@@ -230,7 +267,6 @@ public abstract class AbstractCrawler implements SiteCrawler {
      */
     protected void navigateToPage(int pageNumber) {
         try {
-            // 페이지 번호를 가진 요소 찾기 시도
             String pageXpath = "//a[text()='" + pageNumber + "']";
             WebElement pageLink = driver.findElement(By.xpath(pageXpath));
             pageLink.click();
@@ -249,15 +285,14 @@ public abstract class AbstractCrawler implements SiteCrawler {
     protected void processRows(List<WebElement> rows) {
         for (WebElement row : rows) {
             try {
-                // 날짜 텍스트 추출
                 String dateText = extractDateText(row);
-                if (dateText.isEmpty()) continue; // 날짜를 찾지 못하면 건너뛰기
+                if (dateText.isEmpty()) {
+                    continue;
+                }
 
-                // 오늘 날짜인 경우만 처리
                 if (isToday(dateText)) {
                     todayTotal.incrementAndGet(); // 총 개수 증가
 
-                    // 완료 상태 확인
                     if (isCompleted(row)) {
                         todayCompleted.incrementAndGet();
                     } else {
@@ -297,8 +332,6 @@ public abstract class AbstractCrawler implements SiteCrawler {
      */
     protected boolean isToday(String dateText) {
         try {
-            // 날짜 포맷이 다양할 수 있으므로 여러 방식 시도
-
             // 1. 직접 문자열 포함 여부 확인
             String todayString = today.getYear() + ". " + today.getMonthValue() + ". " + today.getDayOfMonth();
             String todayStringWithZero = today.getYear() + ". " +
@@ -378,7 +411,6 @@ public abstract class AbstractCrawler implements SiteCrawler {
      * Redis에 크롤링 결과 저장 메서드
      */
     protected void saveCrawlResultToRedis() {
-        // 오늘 날짜와 현재 시간 가져오기
         LocalDateTime lastUpdatedTime = LocalDateTime.now(ZoneId.of("Asia/Seoul"));
 
         try {
@@ -389,6 +421,7 @@ public abstract class AbstractCrawler implements SiteCrawler {
                     .notCompletedCount(todayNotCompleted.get())
                     .totalCount(todayTotal.get())
                     .crawlDate(today)
+                    .sequence(getSequence())
                     .lastUpdatedAt(lastUpdatedTime)
                     .build();
 
