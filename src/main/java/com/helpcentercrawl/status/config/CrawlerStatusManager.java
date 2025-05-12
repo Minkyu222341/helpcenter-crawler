@@ -62,21 +62,10 @@ public class CrawlerStatusManager {
      * 특정 사이트의 크롤링 활성화 상태 확인
      */
     @Transactional(readOnly = true)
-    public boolean isSiteEnabled(String siteCode, String siteName) {
+    public boolean isSiteEnabled(String siteCode) {
         Optional<CrawlerStatus> statusOpt = repository.findBySiteCode(siteCode);
 
-        if (statusOpt.isPresent()) {
-            return statusOpt.get().isEnabled();
-        } else {
-            CrawlerStatus newStatus = CrawlerStatus.builder()
-                    .siteCode(siteCode)
-                    .siteName(siteName)
-                    .enabled(true)
-                    .build();
-
-            repository.save(newStatus);
-            return true;
-        }
+        return statusOpt.map(CrawlerStatus::isEnabled).orElse(false);
     }
 
     /**

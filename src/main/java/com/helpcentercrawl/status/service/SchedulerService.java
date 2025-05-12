@@ -66,7 +66,7 @@ public class SchedulerService {
             throw new IllegalArgumentException("존재하지 않는 사이트 코드입니다: " + siteCode);
         }
 
-        boolean isEnabled = crawlerStatusManager.isSiteEnabled(siteCode, crawler.getSiteName());
+        boolean isEnabled = crawlerStatusManager.isSiteEnabled(siteCode);
 
         return SiteStatusResponse.builder()
                 .siteCode(siteCode)
@@ -85,7 +85,7 @@ public class SchedulerService {
             String siteCode = crawler.getSiteCode();
             String siteName = crawler.getSiteName();
 
-            boolean isEnabled = crawlerStatusManager.isSiteEnabled(siteCode, siteName);
+            boolean isEnabled = crawlerStatusManager.isSiteEnabled(siteCode);
 
             result.add(SiteStatusResponse.builder()
                     .siteCode(siteCode)

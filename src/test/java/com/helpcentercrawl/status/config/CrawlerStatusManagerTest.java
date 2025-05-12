@@ -36,6 +36,63 @@ class CrawlerStatusManagerTest {
     }
 
     @Test
+    @DisplayName("크롤러 상태 확인 - 활성화된 상태가 있는 경우")
+    void isSiteEnabled_WhenStatusExistsAndEnabled() {
+        // given
+        CrawlerStatus status = CrawlerStatus.builder()
+                .id(1L)
+                .siteCode(TEST_SITE_CODE)
+                .siteName("테스트 사이트")
+                .enabled(true)
+                .build();
+        when(repository.findBySiteCode(TEST_SITE_CODE)).thenReturn(Optional.of(status));
+
+        // when
+        boolean result = crawlerStatusManager.isSiteEnabled(TEST_SITE_CODE);
+
+        // then
+        assertThat(result).isTrue();
+        verify(repository).findBySiteCode(TEST_SITE_CODE);
+        verify(repository, never()).save(any(CrawlerStatus.class));
+    }
+
+    @Test
+    @DisplayName("크롤러 상태 확인 - 비활성화된 상태가 있는 경우")
+    void isSiteEnabled_WhenStatusExistsAndDisabled() {
+        // given
+        CrawlerStatus status = CrawlerStatus.builder()
+                .id(1L)
+                .siteCode(TEST_SITE_CODE)
+                .siteName("테스트 사이트")
+                .enabled(false)
+                .build();
+        when(repository.findBySiteCode(TEST_SITE_CODE)).thenReturn(Optional.of(status));
+
+        // when
+        boolean result = crawlerStatusManager.isSiteEnabled(TEST_SITE_CODE);
+
+        // then
+        assertThat(result).isFalse();
+        verify(repository).findBySiteCode(TEST_SITE_CODE);
+        verify(repository, never()).save(any(CrawlerStatus.class));
+    }
+
+    @Test
+    @DisplayName("크롤러 상태 확인 - 기존 상태가 없는 경우")
+    void isSiteEnabled_WhenStatusDoesNotExist() {
+        // given
+        when(repository.findBySiteCode(TEST_SITE_CODE)).thenReturn(Optional.empty());
+
+        // when
+        boolean result = crawlerStatusManager.isSiteEnabled(TEST_SITE_CODE);
+
+        // then
+        assertThat(result).isFalse(); // 구현에 따르면 상태가 없으면 false를 반환합니다
+        verify(repository).findBySiteCode(TEST_SITE_CODE);
+        verify(repository, never()).save(any(CrawlerStatus.class)); // save 메서드가 호출되지 않아야 합니다
+    }
+
+    @Test
     @DisplayName("크롤러 상태 설정 - 기존 상태가 있는 경우")
     void setSiteEnabled_WhenStatusExists() {
         // given

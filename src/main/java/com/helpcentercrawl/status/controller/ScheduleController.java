@@ -1,6 +1,9 @@
 package com.helpcentercrawl.status.controller;
 
-import com.helpcentercrawl.status.dto.*;
+import com.helpcentercrawl.status.dto.SchedulerStatusRequest;
+import com.helpcentercrawl.status.dto.SchedulerStatusResponse;
+import com.helpcentercrawl.status.dto.SiteStatusRequest;
+import com.helpcentercrawl.status.dto.SiteStatusResponse;
 import com.helpcentercrawl.status.service.SchedulerService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,6 +23,7 @@ import java.util.List;
  * -----------------------------------------------------------
  * 25. 4. 28.        MinKyu Park       최초 생성
  * 25. 5. 9.         MinKyu Park       사이트별 상태 관리 기능 추가
+ * 25. 5. 12.        MinKyu Park       REST API 설계 원칙에 따른 메소드 및 엔드포인트 개선
  */
 @Slf4j
 @RestController
@@ -33,7 +37,6 @@ public class ScheduleController {
      */
     @GetMapping("/status")
     public ResponseEntity<SchedulerStatusResponse> getScheduleStatus() {
-
         return ResponseEntity.ok(schedulerService.getSchedulerStatus());
     }
 
@@ -42,10 +45,11 @@ public class ScheduleController {
      *
      * @param request 상태 변경 요청 정보 (status: true/false)
      */
-    @PostMapping("/control")
-    public ResponseEntity<SchedulerStatusResponse> controlSchedule(@RequestBody SchedulerStatusRequest request) {
-
-        return ResponseEntity.ok(schedulerService.controlSchedulerStatus(request));
+    @PutMapping("/status")
+    public ResponseEntity<SchedulerStatusResponse> updateScheduleStatus(@RequestBody SchedulerStatusRequest request) {
+        SchedulerStatusResponse response = schedulerService.controlSchedulerStatus(request);
+        log.info("스케줄러 상태 변경 완료: {}", response.isStatus());
+        return ResponseEntity.ok(response);
     }
 
     /**
@@ -72,8 +76,8 @@ public class ScheduleController {
      * @param siteCode 사이트 코드
      * @param request  상태 변경 요청 정보 (enabled: true/false)
      */
-    @PostMapping("/sites/{siteCode}/control")
-    public ResponseEntity<SiteStatusResponse> controlSiteStatus(
+    @PutMapping("/sites/{siteCode}/status")
+    public ResponseEntity<SiteStatusResponse> updateSiteStatus(
             @PathVariable String siteCode,
             @RequestBody SiteStatusRequest request) {
         return ResponseEntity.ok(schedulerService.controlSiteStatus(siteCode, request));

@@ -14,6 +14,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.Arrays;
 import java.util.List;
@@ -103,7 +104,7 @@ class SchedulerServiceTest {
         // given
         when(crawler1.getSiteCode()).thenReturn(SITE1_CODE);
         when(crawler1.getSiteName()).thenReturn(SITE1_NAME);
-        when(crawlerStatusManager.isSiteEnabled(SITE1_CODE, SITE1_NAME)).thenReturn(true);
+        when(crawlerStatusManager.isSiteEnabled(SITE1_CODE)).thenReturn(true);
 
         // when
         SiteStatusResponse response = schedulerService.getSiteStatus(SITE1_CODE);
@@ -112,7 +113,7 @@ class SchedulerServiceTest {
         assertThat(response.getSiteCode()).isEqualTo(SITE1_CODE);
         assertThat(response.getSiteName()).isEqualTo(SITE1_NAME);
         assertThat(response.isEnabled()).isTrue();
-        verify(crawlerStatusManager).isSiteEnabled(SITE1_CODE, SITE1_NAME);
+        verify(crawlerStatusManager).isSiteEnabled(SITE1_CODE);
     }
 
     @Test
@@ -127,7 +128,7 @@ class SchedulerServiceTest {
         assertThatThrownBy(() -> schedulerService.getSiteStatus(UNKNOWN_SITE_CODE))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("존재하지 않는 사이트 코드입니다: " + UNKNOWN_SITE_CODE);
-        verify(crawlerStatusManager, never()).isSiteEnabled(anyString(), anyString());
+        verify(crawlerStatusManager, never()).isSiteEnabled(anyString());
     }
 
     @Test
@@ -139,8 +140,8 @@ class SchedulerServiceTest {
         when(crawler2.getSiteCode()).thenReturn(SITE2_CODE);
         when(crawler2.getSiteName()).thenReturn(SITE2_NAME);
 
-        when(crawlerStatusManager.isSiteEnabled(SITE1_CODE, SITE1_NAME)).thenReturn(true);
-        when(crawlerStatusManager.isSiteEnabled(SITE2_CODE, SITE2_NAME)).thenReturn(false);
+        when(crawlerStatusManager.isSiteEnabled(SITE1_CODE)).thenReturn(true);
+        when(crawlerStatusManager.isSiteEnabled(SITE2_CODE)).thenReturn(false);
 
         // when
         List<SiteStatusResponse> responses = schedulerService.getAllSitesStatus();
@@ -151,8 +152,8 @@ class SchedulerServiceTest {
         assertThat(responses.get(0).isEnabled()).isTrue();
         assertThat(responses.get(1).getSiteCode()).isEqualTo(SITE2_CODE);
         assertThat(responses.get(1).isEnabled()).isFalse();
-        verify(crawlerStatusManager).isSiteEnabled(SITE1_CODE, SITE1_NAME);
-        verify(crawlerStatusManager).isSiteEnabled(SITE2_CODE, SITE2_NAME);
+        verify(crawlerStatusManager).isSiteEnabled(SITE1_CODE);
+        verify(crawlerStatusManager).isSiteEnabled(SITE2_CODE);
     }
 
     @Test
@@ -209,16 +210,4 @@ class SchedulerServiceTest {
         verify(crawlerStatusManager, never()).setSiteEnabled(anyString(), anyString(), anyBoolean());
     }
 
-    // ReflectionTestUtils를 제공하는 유틸리티 클래스
-    private static class ReflectionTestUtils {
-        public static void setField(Object target, String fieldName, Object value) {
-            try {
-                java.lang.reflect.Field field = target.getClass().getDeclaredField(fieldName);
-                field.setAccessible(true);
-                field.set(target, value);
-            } catch (Exception e) {
-                throw new RuntimeException("필드 설정 실패: " + fieldName, e);
-            }
-        }
-    }
 }

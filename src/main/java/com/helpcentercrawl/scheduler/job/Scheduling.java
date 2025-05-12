@@ -50,7 +50,7 @@ public class Scheduling {
             String siteName = crawler.getSiteName();
 
             // 사이트별 활성화 상태 확인
-            if (!crawlerStatusManager.isSiteEnabled(siteCode, siteName)) {
+            if (!crawlerStatusManager.isSiteEnabled(siteCode)) {
                 log.info("{} 크롤러가 비활성화되어 있어 건너뜁니다.", siteName);
                 continue;
             }

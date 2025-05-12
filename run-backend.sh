@@ -18,7 +18,12 @@ ROOT_DIR=$(pwd)
 
 # 백엔드 빌드
 # shellcheck disable=SC2164
-./gradlew -Dorg.gradle.java.home="C:/Program Files/Java/jdk-17" clean bootJar
+# JAVA_HOME 환경 변수가 설정되어 있으면 사용, 아니면 기본 JDK 사용
+if [ -n "$JAVA_HOME" ]; then
+  ./gradlew -Dorg.gradle.java.home="$JAVA_HOME" clean bootJar
+else
+  ./gradlew clean bootJar
+fi
 
 # 루트 디렉토리로 돌아가기
 # shellcheck disable=SC2164
@@ -33,9 +38,27 @@ docker rm helpcenter-backend 2>/dev/null || true
 
 
 # Docker 컨테이너 관리
-docker compose down
-docker compose build
+if ! docker info > /dev/null 2>&1; then
+  echo "Docker가 실행 중이지 않습니다. Docker를 시작한 후 다시 시도해 주세요."
+  exit 1
+fi
+
+# Docker 명령 실행 및 오류 처리
+if ! docker compose down; then
+  echo "Docker Compose down 명령 실패!"
+  exit 1
+fi
+
+if ! docker compose build; then
+  echo "Docker Compose build 명령 실패!"
+  exit 1
+fi
+
 docker image prune -f
-docker compose up -d
+
+if ! docker compose up -d; then
+  echo "Docker Compose up 명령 실패!"
+  exit 1
+fi
 
 echo "백엔드 서비스 배포 완료!"
