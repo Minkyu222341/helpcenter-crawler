@@ -1,22 +1,23 @@
 services:
-  app:
-    build: .
-    container_name: helpcenter-crawler
+  # 백엔드 서비스
+  backend:
+    build:
+      context: /
+      dockerfile: Dockerfile
+    container_name: helpcenter-backend
     ports:
-      - "8081:8081"
+      - "8082:8082"
     expose:
-      - "8081"
+      - "8082"  # 컨테이너 포트 노출
     environment:
       - TZ=Asia/Seoul
       - SPRING_PROFILES_ACTIVE=prod,secret
-
+      - SPRING_REDIS_HOST=redis-main
+      - SPRING_REDIS_PORT=6379
       - SPRING_DATASOURCE_DRIVER_CLASS_NAME=${SPRING_DATASOURCE_DRIVER_CLASS_NAME}
       - SPRING_DATASOURCE_URL=${SPRING_DATASOURCE_URL}
       - SPRING_DATASOURCE_USERNAME=${SPRING_DATASOURCE_USERNAME}
       - SPRING_DATASOURCE_PASSWORD=${SPRING_DATASOURCE_PASSWORD}
-
-      - SPRING_REDIS_HOST=redis-main
-      - SPRING_REDIS_PORT=6379
     restart: unless-stopped
     depends_on:
       redis-main:
@@ -24,6 +25,7 @@ services:
     networks:
       - helpcenter-network
 
+  # Redis 설정
   redis-main:
     image: redis:latest
     container_name: redis-main

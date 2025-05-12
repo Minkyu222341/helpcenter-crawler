@@ -60,7 +60,6 @@ dependencies {
     // 오라클 DB
     runtimeOnly 'com.oracle.database.jdbc:ojdbc11'
 
-
 }
 
 tasks.named('test') {
