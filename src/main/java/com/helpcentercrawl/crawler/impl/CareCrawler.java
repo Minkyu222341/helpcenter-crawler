@@ -84,8 +84,4 @@ public class CareCrawler extends AbstractCrawler {
         return valueSettings.getCareCode();
     }
 
-    @Override
-    public Integer getSequence() {
-        return 9;
-    }
 }

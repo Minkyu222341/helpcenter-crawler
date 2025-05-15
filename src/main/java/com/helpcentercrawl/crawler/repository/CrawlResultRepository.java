@@ -7,11 +7,12 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface CrawlResultRepository extends JpaRepository<CrawlResult, Long> {
+public interface CrawlResultRepository extends JpaRepository<CrawlResult, Long> , CrawlResultRepositoryCustom {
 
     /**
      * 사이트 코드로 크롤링 결과 조회
      */
     List<CrawlResult> findBySiteCode(String siteCode);
+
 
 }

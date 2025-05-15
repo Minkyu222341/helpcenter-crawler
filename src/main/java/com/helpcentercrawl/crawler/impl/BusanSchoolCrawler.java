@@ -156,8 +156,4 @@ public class BusanSchoolCrawler extends AbstractCrawler {
         return valueSettings.getBusanSchoolCode();
     }
 
-    @Override
-    public Integer getSequence() {
-        return 1;
-    }
 }

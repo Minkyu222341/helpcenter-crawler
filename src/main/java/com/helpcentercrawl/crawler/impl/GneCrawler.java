@@ -27,20 +27,6 @@ public class GneCrawler extends AbstractCrawler {
         super(crawlResultService, valueSettings);
     }
 
-    @Override
-    public String getSiteName() {
-        return valueSettings.getGneName();
-    }
-
-    @Override
-    public String getSiteCode() {
-        return valueSettings.getGneCode();
-    }
-
-    @Override
-    public Integer getSequence() {
-        return 2;
-    }
 
     @Override
     protected void accessUrl() {
@@ -92,7 +78,7 @@ public class GneCrawler extends AbstractCrawler {
 
     @Override
     protected void navigateToTargetPage() {
-        driver.get(valueSettings.getGneTargetUrl()+PAGE_COUNT);
+        driver.get(valueSettings.getGneTargetUrl() + PAGE_COUNT);
     }
 
     @Override
@@ -108,5 +94,15 @@ public class GneCrawler extends AbstractCrawler {
     @Override
     protected int getDateIndex() {
         return DATE_INDEX;
+    }
+
+    @Override
+    public String getSiteName() {
+        return valueSettings.getGneName();
+    }
+
+    @Override
+    public String getSiteCode() {
+        return valueSettings.getGneCode();
     }
 }

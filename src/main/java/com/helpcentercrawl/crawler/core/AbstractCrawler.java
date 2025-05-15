@@ -30,8 +30,6 @@ public abstract class AbstractCrawler implements SiteCrawler {
     protected final CrawlerValueSettings valueSettings;
     protected WebDriver driver;
     protected WebDriverWait wait;
-
-    // 수집된 요청 정보 저장 목록
     protected List<CrawlResult> crawledRequests = new ArrayList<>();
 
     private static final String LOCAL_CHROME_DRIVER_PATH = "src/main/resources/chromedriver/windows/chromedriver.exe";
@@ -227,6 +225,12 @@ public abstract class AbstractCrawler implements SiteCrawler {
                     List<WebElement> cells = row.findElements(By.tagName("td"));
 
                     if (cells.size() > Math.max(getTitleIndex(), getDateIndex())) {
+
+
+                        if (isNotice(cells.get(0))) {
+                            continue;
+                        }
+
                         WebElement titleCell = cells.get(getTitleIndex());
                         WebElement dateCell = cells.get(getDateIndex());
 
@@ -253,6 +257,26 @@ public abstract class AbstractCrawler implements SiteCrawler {
 
         } catch (Exception e) {
             log.error("데이터 처리 오류: {}", e.getMessage());
+        }
+    }
+
+    protected boolean isNotice(WebElement cell) {
+        try {
+            List<WebElement> noticeElements = cell.findElements(By.cssSelector(".btn_red, .btn_5"));
+
+            if (!noticeElements.isEmpty()) {
+                for (WebElement element : noticeElements) {
+                    String elementText = element.getText().trim();
+
+                    if (elementText.contains("공지")) {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        } catch (Exception e) {
+            log.warn("{} - 공지 확인 중 오류: {}", getSiteName(), e.getMessage());
+            return false;
         }
     }
 
@@ -313,12 +337,21 @@ public abstract class AbstractCrawler implements SiteCrawler {
             List<WebElement> spans = row.findElements(By.cssSelector("span"));
             for (WebElement span : spans) {
                 String spanText = span.getText().trim();
-                if (spanText.equals("완료")) {
+                if (spanText.contains("완료")) {
                     completed = true;
                     break;
                 }
             }
         }
+
+        //해양대
+        if (!completed) {
+            List<WebElement> cells = row.findElements(By.tagName("td"));
+            if (cells.get(1).getText().trim().contains("완료")) {
+                completed = true;
+            }
+        }
+
         return completed;
     }
 
@@ -345,10 +378,8 @@ public abstract class AbstractCrawler implements SiteCrawler {
                 return;
             }
 
-            // 중복 비교 데이터 (DB 조회)
             List<CrawlResult> existingData = crawlResultService.findExistingResults(getSiteCode());
 
-            // 중복 제거 (제목, 날짜, 사이트코드 기준)
             List<CrawlResult> newData = crawledRequests.stream()
                     .filter(newResult -> !isDuplicate(newResult, existingData))
                     .collect(Collectors.toList());

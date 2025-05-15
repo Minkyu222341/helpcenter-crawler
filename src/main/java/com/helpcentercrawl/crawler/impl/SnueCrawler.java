@@ -106,8 +106,4 @@ public class SnueCrawler extends AbstractCrawler {
         return valueSettings.getSnueCode();
     }
 
-    @Override
-    public Integer getSequence() {
-        return 8;
-    }
 }

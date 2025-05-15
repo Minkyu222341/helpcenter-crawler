@@ -119,9 +119,4 @@ public class GnuCrawler extends AbstractCrawler {
     public String getSiteCode() {
         return valueSettings.getGnuCode();
     }
-
-    @Override
-    public Integer getSequence() {
-        return 7;
-    }
 }

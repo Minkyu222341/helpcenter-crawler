@@ -33,6 +33,6 @@ spring:
         dialect: org.hibernate.dialect.OracleDialect
     open-in-view: false
 
-#logging:
-#  level:
-#    root: ERROR
+logging:
+  level:
+    root: ERROR

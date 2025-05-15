@@ -78,8 +78,9 @@ public class ScheduleController {
      */
     @PutMapping("/sites/{siteCode}/status")
     public ResponseEntity<SiteStatusResponse> updateSiteStatus(
-            @PathVariable String siteCode,
+            @PathVariable("siteCode") String siteCode,
             @RequestBody SiteStatusRequest request) {
+
         return ResponseEntity.ok(schedulerService.controlSiteStatus(siteCode, request));
     }
 }

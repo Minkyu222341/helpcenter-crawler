@@ -98,8 +98,4 @@ public class BusanMainCrawler extends AbstractCrawler {
         return valueSettings.getBusanMainCode();
     }
 
-    @Override
-    public Integer getSequence() {
-        return 3;
-    }
 }

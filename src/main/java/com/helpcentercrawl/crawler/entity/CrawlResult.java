@@ -23,10 +23,6 @@ public class CrawlResult extends BaseEntity {
     @Column(nullable = false)
     private String siteCode;
 
-    @Comment("사이트 이름")
-    @Column(nullable = false)
-    private String siteName;
-
     @Comment("요청 처리 상태")
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -44,7 +40,6 @@ public class CrawlResult extends BaseEntity {
     public CrawlResult(Long id, String siteCode, String siteName, RequestStatus status, String title, LocalDate requestDate) {
         this.id = id;
         this.siteCode = siteCode;
-        this.siteName = siteName;
         this.status = status;
         this.title = title;
         this.requestDate = requestDate;

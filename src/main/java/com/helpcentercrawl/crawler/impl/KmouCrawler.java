@@ -99,9 +99,4 @@ public class KmouCrawler extends AbstractCrawler {
     public String getSiteCode() {
         return valueSettings.getKmouCode();
     }
-
-    @Override
-    public Integer getSequence() {
-        return 6;
-    }
 }

@@ -73,8 +73,4 @@ public class ChangwonCrawler extends AbstractCrawler {
         return valueSettings.getChangwonCode();
     }
 
-    @Override
-    public Integer getSequence() {
-        return 5;
-    }
 }
