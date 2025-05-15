@@ -8,6 +8,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.util.List;
 
 /**
@@ -21,6 +23,7 @@ import java.util.List;
  * -----------------------------------------------------------
  * 25. 5. 2.        MinKyu Park       최초 생성
  * 25. 5. 9.        MinKyu Park       사이트별 상태 확인 로직 추가
+ * 25. 5. 13.       MinKyu Park       크롤링 실행 시간 측정 로직 추가
  */
 @Slf4j
 @Component
@@ -34,8 +37,10 @@ public class Scheduling {
     /**
      * 3분마다 크롤링 실행 (월-금요일, 08:00 ~ 18:00 사이에만)
      */
-    @Scheduled(cron = "${scheduler.crawler.cron}")
+//    @Scheduled(cron = "${scheduler.crawler.cron}")
+    @Scheduled(fixedDelay = 180000, initialDelay = 1000)
     public void runCrawlers() {
+        Instant totalStart = Instant.now();
 
         if (!statusManager.isSchedulingEnabled()) {
             log.info("크롤링 스케줄링이 비활성화되어 있어 작업을 건너뜁니다.");
@@ -57,14 +62,18 @@ public class Scheduling {
 
             enabledCount++;
 
+
             try {
                 crawler.crawl();
             } catch (Exception e) {
-                log.error("{} 크롤링 중 오류 발생: {}", crawler.getSiteName(), e.getMessage());
+                log.error("{} 크롤링 중 오류 발생: {}", siteName, e.getMessage());
                 log.error("오류 상세 정보:", e);
             }
         }
 
-        log.info("크롤링 완료: 활성화된 {} 개 사이트 실행됨", enabledCount);
+        Instant totalEnd = Instant.now();
+        Duration totalDuration = Duration.between(totalStart, totalEnd);
+
+        log.info("크롤링 작업 완료 - 활성화된 크롤러: {}/{}, 총 실행 시간: {}초", enabledCount, crawlers.size(), totalDuration.toSeconds());
     }
 }

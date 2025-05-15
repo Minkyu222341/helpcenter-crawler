@@ -5,12 +5,8 @@ import com.helpcentercrawl.crawler.core.AbstractCrawler;
 import com.helpcentercrawl.crawler.model.LoginModel;
 import com.helpcentercrawl.crawler.service.CrawlResultService;
 import lombok.extern.slf4j.Slf4j;
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.springframework.stereotype.Component;
-
-import java.util.List;
 
 /**
  * packageName    : com.helpcentercrawl.crawler.impl
@@ -26,6 +22,10 @@ import java.util.List;
 @Slf4j
 @Component
 public class KmouCrawler extends AbstractCrawler {
+
+    private static final int TITLE_INDEX = 2;
+    private static final int DATE_INDEX = 4;
+    private static final String TABLE_SELECTOR = "tbody > tr";
 
     public KmouCrawler(CrawlResultService crawlResultService, CrawlerValueSettings valueSettings) {
         super(crawlResultService, valueSettings);
@@ -72,37 +72,22 @@ public class KmouCrawler extends AbstractCrawler {
 
     @Override
     protected void navigateToTargetPage() {
-        driver.get(valueSettings.getKmouTargetUrl());
-        log.info("해양대학교 헬프센터 메인페이지 접속 완료");
+        driver.get(valueSettings.getKmouTargetUrl()+PAGE_COUNT);
     }
 
     @Override
-    protected void processPageData() {
-        processMultiplePages("table > tbody > tr");
-
+    protected String getTableSelector() {
+        return TABLE_SELECTOR;
     }
 
     @Override
-    protected int getMaxPagesCount() {
-        int maxPages = 1;
-        try {
+    protected int getTitleIndex() {
+        return TITLE_INDEX;
+    }
 
-            List<WebElement> pagination = driver.findElements(By.cssSelector(".BD_paging > a"));
-
-            // 페이지 수 파악 (마지막 페이지 번호 찾기)
-            for (WebElement pageLink : pagination) {
-                String pageText = pageLink.getText().trim();
-                if (pageText.matches("\\d+")) {
-                    int pageNum = Integer.parseInt(pageText);
-                    if (pageNum > maxPages) {
-                        maxPages = pageNum;
-                    }
-                }
-            }
-        } catch (Exception e) {
-            log.error("페이지네이션 요소를 찾을 수 없습니다: {}", e.getMessage());
-        }
-        return maxPages;
+    @Override
+    protected int getDateIndex() {
+        return DATE_INDEX;
     }
 
     @Override

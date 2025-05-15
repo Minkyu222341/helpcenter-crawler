@@ -5,6 +5,7 @@ import com.helpcentercrawl.crawler.core.AbstractCrawler;
 import com.helpcentercrawl.crawler.model.LoginModel;
 import com.helpcentercrawl.crawler.service.CrawlResultService;
 import lombok.extern.slf4j.Slf4j;
+import org.openqa.selenium.By;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -22,10 +23,16 @@ import java.time.Duration;
  * DATE              AUTHOR             NOTE
  * -----------------------------------------------------------
  * 25. 5. 2.        MinKyu Park       최초 생성
+ * 25. 5. 14.       MinKyu Park       다중 URL 크롤링 기능 추가
  */
 @Slf4j
 @Component
 public class GnuCrawler extends AbstractCrawler {
+
+    private static final String TABLE_SELECTOR = "table > tbody > tr";
+    private static final int TITLE_INDEX = 2;
+    private static final int DATE_INDEX = 4;
+
     public GnuCrawler(CrawlResultService crawlResultService, CrawlerValueSettings valueSettings) {
         super(crawlResultService, valueSettings);
     }
@@ -49,7 +56,7 @@ public class GnuCrawler extends AbstractCrawler {
     }
 
     @Override
-    protected void handlePopup(){
+    protected void handlePopup() {
         try {
             WebDriverWait alertWait = new WebDriverWait(driver, Duration.ofSeconds(3));
             alertWait.until(ExpectedConditions.alertIsPresent());
@@ -62,17 +69,45 @@ public class GnuCrawler extends AbstractCrawler {
 
     @Override
     protected void navigateToTargetPage() {
-        driver.get(valueSettings.getGnuMainTargetUrl());
-        log.info("경상국립대 헬프센터 메인페이지 접속 완료");
+        driver.get(valueSettings.getGnuMainTargetUrl()+PAGE_COUNT);
+
+        try {
+            wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector(TABLE_SELECTOR)));
+        } catch (Exception e) {
+            log.warn("경상국립대 메인페이지 테이블 로딩 실패: {}", e.getMessage());
+        }
+    }
+
+    /**
+     * 다중 URL 크롤링을 위해 processData 메서드 오버라이드
+     */
+    @Override
+    protected void processMultiplePages() {
+        super.processMultiplePages();
+
+        driver.get(valueSettings.getGnuSubTargetUrl() + PAGE_COUNT);
+
+        try {
+            wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector(TABLE_SELECTOR)));
+        } catch (Exception e) {
+            log.warn("경상국립대 서브페이지 테이블 로딩 실패: {}", e.getMessage());
+        }
+        super.processMultiplePages();
     }
 
     @Override
-    protected void processPageData(){
-        processMultiplePages("table > tbody > tr");
+    protected String getTableSelector() {
+        return TABLE_SELECTOR;
+    }
 
-        driver.get(valueSettings.getGnuSubTargetUrl());
-        log.info("경상국립대 헬프센터 서브페이지 접속 완료");
+    @Override
+    protected int getTitleIndex() {
+        return TITLE_INDEX;
+    }
 
+    @Override
+    protected int getDateIndex() {
+        return DATE_INDEX;
     }
 
     @Override

@@ -8,7 +8,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.stereotype.Component;
+
+import java.time.Duration;
 
 /**
  * packageName    : com.helpcentercrawl.crawler.impl
@@ -24,6 +27,10 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 public class SnueCrawler extends AbstractCrawler {
+    private static final int TITLE_INDEX = 1;
+    private static final int DATE_INDEX = 3;
+    private static final String TABLE_SELECTOR = "tbody > tr";
+
     public SnueCrawler(CrawlResultService crawlResultService, CrawlerValueSettings valueSettings) {
         super(crawlResultService, valueSettings);
     }
@@ -57,15 +64,36 @@ public class SnueCrawler extends AbstractCrawler {
         }
     }
 
-    @Override
-    protected void navigateToTargetPage() {
-        driver.get(valueSettings.getSnueTargetUrl());
-        log.info("서울교대 헬프센터 접속 완료");
+    private boolean isElementPresent(By locator) {
+        try {
+            WebDriverWait shortWait = new WebDriverWait(driver, Duration.ofSeconds(2));
+            shortWait.until(ExpectedConditions.presenceOfElementLocated(locator));
+            return true;
+        } catch (org.openqa.selenium.TimeoutException e) {
+            return false;
+        }
     }
 
     @Override
-    protected void processPageData() {
-        processMultiplePages("div.BD_list table tbody tr");
+    protected void navigateToTargetPage() throws InterruptedException {
+        Thread.sleep(1000);
+
+        driver.get(valueSettings.getSnueTargetUrl()+PAGE_COUNT);
+    }
+
+    @Override
+    protected String getTableSelector() {
+        return TABLE_SELECTOR;
+    }
+
+    @Override
+    protected int getTitleIndex() {
+        return TITLE_INDEX;
+    }
+
+    @Override
+    protected int getDateIndex() {
+        return DATE_INDEX;
     }
 
     @Override

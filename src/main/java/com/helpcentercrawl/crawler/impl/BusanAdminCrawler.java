@@ -27,6 +27,13 @@ import java.time.Duration;
 @Slf4j
 @Component
 public class BusanAdminCrawler extends AbstractCrawler {
+
+    private static final String TABLE_SELECTOR = "table tbody tr";
+
+    // TD 인덱스 상수 (0부터 시작)
+    private static final int TITLE_INDEX = 2;
+    private static final int DATE_INDEX = 4;
+
     public BusanAdminCrawler(CrawlResultService crawlResultService, CrawlerValueSettings valueSettings) {
         super(crawlResultService, valueSettings);
     }
@@ -56,20 +63,29 @@ public class BusanAdminCrawler extends AbstractCrawler {
             alertWait.until(ExpectedConditions.alertIsPresent());
 
             driver.switchTo().alert().accept();
-        } catch (TimeoutException e) {
-            log.info("Alert 창이 나타나지 않았습니다.");
+        } catch (TimeoutException ignored) {
+            log.debug("Alert 창이 나타나지 않았습니다.");
         }
     }
 
     @Override
     protected void navigateToTargetPage() {
-        driver.get(valueSettings.getBusanAdminTargetUrl());
-        log.info("부산행정 헬프센터 접속 완료");
+        driver.get(valueSettings.getBusanAdminTargetUrl()+PAGE_COUNT);
     }
 
     @Override
-    protected void processPageData() {
-        processMultiplePages("table tbody tr");
+    protected String getTableSelector() {
+        return TABLE_SELECTOR;
+    }
+
+    @Override
+    protected int getTitleIndex() {
+        return TITLE_INDEX;
+    }
+
+    @Override
+    protected int getDateIndex() {
+        return DATE_INDEX;
     }
 
     @Override

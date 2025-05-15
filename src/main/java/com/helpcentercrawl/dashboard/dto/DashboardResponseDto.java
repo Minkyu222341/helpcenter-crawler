@@ -1,11 +1,15 @@
 package com.helpcentercrawl.dashboard.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
 
 @Getter
+@Builder
+@AllArgsConstructor
 public class DashboardResponseDto {
     private String siteCode;
     private String siteName;
@@ -15,4 +19,6 @@ public class DashboardResponseDto {
     private Integer sequence;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime lastUpdatedAt;
+
+
 }

@@ -16,5 +16,8 @@ public interface SiteCrawler {
     String getSiteName();
     String getSiteCode();
     Integer getSequence();
+
     void crawl();
+    void crawlAllPages();
+
 }

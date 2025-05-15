@@ -27,12 +27,12 @@ spring:
   # JPA 설정 추가
   jpa:
     hibernate:
-      ddl-auto: validate
+      ddl-auto: update
     properties:
       hibernate:
         dialect: org.hibernate.dialect.OracleDialect
     open-in-view: false
 
-logging:
-  level:
-    root: ERROR
+#logging:
+#  level:
+#    root: ERROR

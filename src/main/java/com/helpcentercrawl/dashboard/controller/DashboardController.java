@@ -23,6 +23,8 @@ public class DashboardController {
      */
     @GetMapping("/dashboard")
     public ResponseEntity<List<DashboardResponseDto>> getDashboardList() {
+
+        System.out.println("대시보드 조회 API 호출");
         List<DashboardResponseDto> dashBoardList = dashboardService.getDashBoardList();
 
         return ResponseEntity.ok(dashBoardList);
