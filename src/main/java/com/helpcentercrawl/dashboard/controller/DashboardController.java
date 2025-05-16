@@ -1,6 +1,7 @@
 package com.helpcentercrawl.dashboard.controller;
 
 import com.helpcentercrawl.dashboard.dto.DashboardResponseDto;
+import com.helpcentercrawl.dashboard.dto.DashboardSearchCondition;
 import com.helpcentercrawl.dashboard.service.DashboardService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -22,8 +23,8 @@ public class DashboardController {
      * @return List<DashBoardResponseDto>
      */
     @GetMapping("/dashboard")
-    public ResponseEntity<List<DashboardResponseDto>> getDashboardList() {
-        List<DashboardResponseDto> dashBoardList = dashboardService.getDashBoardList();
+    public ResponseEntity<List<DashboardResponseDto>> getDashboardList(DashboardSearchCondition condition) {
+        List<DashboardResponseDto> dashBoardList = dashboardService.getDashBoardList(condition);
 
         return ResponseEntity.ok(dashBoardList);
     }

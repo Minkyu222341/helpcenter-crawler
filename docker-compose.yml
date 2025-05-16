@@ -25,20 +25,6 @@ services:
     networks:
       - helpcenter-network
 
-  # Redis 설정
-  redis-main:
-    image: redis:latest
-    container_name: redis-main
-    environment:
-      - TZ=Asia/Seoul
-    ports:
-      - "6379:6379"
-    restart: unless-stopped
-    volumes:
-      - redis-data:/data
-    networks:
-      - helpcenter-network
-
 volumes:
   redis-data:
 

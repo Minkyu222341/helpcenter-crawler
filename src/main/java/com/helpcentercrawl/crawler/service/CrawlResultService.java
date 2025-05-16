@@ -1,56 +1,57 @@
 package com.helpcentercrawl.crawler.service;
 
-import com.helpcentercrawl.crawler.dto.CrawlResultDto;
-import com.helpcentercrawl.crawler.dto.CrawlSaveDto;
-import com.helpcentercrawl.crawler.repository.CrawlResultRedisRepository;
+import com.helpcentercrawl.crawler.entity.CrawlResult;
+import com.helpcentercrawl.crawler.repository.CrawlResultRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
-
-/**
- * packageName    : com.helpcentercrawl.crawler.service
- * fileName       : CrawlResultService
- * author         : MinKyu Park
- * date           : 25. 4. 21.
- * description    : 크롤링 결과를 Redis에 저장하고 조회하는 서비스
- * ===========================================================
- * DATE              AUTHOR             NOTE
- * -----------------------------------------------------------
- * 25. 4. 21.        MinKyu Park       최초 생성
- */
+import java.util.Collections;
+import java.util.List;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class CrawlResultService {
 
-    private final CrawlResultRedisRepository crawlResultRedisRepository;
+    private final CrawlResultRepository crawlResultRepository;
 
     /**
-     * 크롤링 결과를 Redis에 저장
+     * 크롤링 결과 목록을 DB에 저장
+     *
+     * @param crawlResults 저장할 크롤링 결과 목록
+     * @return 저장된 크롤링 결과 목록
      */
-    public void saveCrawlResult(CrawlSaveDto crawlSaveDto) {
+    @Transactional
+    public List<CrawlResult> saveCrawlResults(List<CrawlResult> crawlResults) {
+        if (crawlResults == null || crawlResults.isEmpty()) {
+            log.warn("저장할 크롤링 결과가 없습니다.");
+            return Collections.emptyList();
+        }
+
         try {
-            crawlResultRedisRepository.saveCrawlResult(crawlSaveDto);
-            log.info("Redis에 크롤링 결과 저장 완료: {}", crawlSaveDto.getSiteName());
+            return crawlResultRepository.saveAll(crawlResults);
         } catch (Exception e) {
-            log.error("Redis에 크롤링 결과 저장 중 오류 발생: {}", e.getMessage(), e);
+            log.error("DB에 크롤링 결과 저장 중 오류 발생: {}", e.getMessage(), e);
             throw e;
         }
     }
 
     /**
-     * 특정 사이트와 날짜에 해당하는 크롤링 결과 조회
+     * 특정 사이트의 기존 크롤링 결과 조회 (중복 확인용)
+     *
+     * @param siteCode 사이트 코드
+     * @return 해당 사이트의 모든 크롤링 결과
      */
-    public CrawlResultDto getCrawlResult(String siteCode, LocalDate date) {
+    @Transactional(readOnly = true)
+    public List<CrawlResult> findExistingResults(String siteCode) {
         try {
-            return crawlResultRedisRepository.getCrawlResult(siteCode, date);
-        }catch (Exception e) {
-            log.error("Redis에서 크롤링 결과 조회 중 오류 발생: {}", e.getMessage(), e);
-            throw e;
+            return crawlResultRepository.findBySiteCode(siteCode);
+        } catch (Exception e) {
+            log.error("기존 크롤링 결과 조회 중 오류 발생: 사이트={}, 오류={}",
+                    siteCode, e.getMessage(), e);
+            return Collections.emptyList();
         }
-
     }
 }

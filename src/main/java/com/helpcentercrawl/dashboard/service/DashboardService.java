@@ -1,12 +1,12 @@
 package com.helpcentercrawl.dashboard.service;
 
+import com.helpcentercrawl.crawler.repository.CrawlResultRepository;
 import com.helpcentercrawl.dashboard.dto.DashboardResponseDto;
-import com.helpcentercrawl.dashboard.repository.DashboardResultRedisRepository;
+import com.helpcentercrawl.dashboard.dto.DashboardSearchCondition;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.util.List;
 
 @Slf4j
@@ -14,15 +14,15 @@ import java.util.List;
 @RequiredArgsConstructor
 public class DashboardService {
 
-    private final DashboardResultRedisRepository dashboardResultRedisRepository;
+    private final CrawlResultRepository crawlResultRepository;
 
     /**
      * 대시보드에 표시할 크롤링 결과 조회
+     *
      * @return List<DashBoardResponseDto>
      */
-    public List<DashboardResponseDto> getDashBoardList() {
+    public List<DashboardResponseDto> getDashBoardList(DashboardSearchCondition condition) {
 
-        return dashboardResultRedisRepository.getAllCrawlResultsByDate(LocalDate.now());
+        return crawlResultRepository.findDashboardDateList(condition);
     }
-
 }
