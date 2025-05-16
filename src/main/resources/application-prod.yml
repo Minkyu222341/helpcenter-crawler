@@ -14,14 +14,6 @@ spring:
     username: ${spring.datasource.username:?DB 사용자명이 설정되지 않았습니다. application-secret.yml을 확인하세요}
     password: ${spring.datasource.password:?DB 비밀번호가 설정되지 않았습니다. application-secret.yml을 확인하세요}
 
-  # Redis 설정
-  data:
-    redis:
-      host: redis-main
-      port: 6379
-      timeout: 10000
-      database: 0
-
   # JPA 설정 추가
   jpa:
     hibernate:

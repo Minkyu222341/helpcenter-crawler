@@ -1,8 +1,9 @@
 package com.helpcentercrawl.scheduler.job;
 
 import com.helpcentercrawl.crawler.interfaces.SiteCrawler;
-import com.helpcentercrawl.status.config.CrawlerStatusManager;
 import com.helpcentercrawl.status.config.SchedulerStatusManager;
+import com.helpcentercrawl.status.entity.CrawlerStatus;
+import com.helpcentercrawl.status.repository.CrawlerStatusRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Component;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * packageName    : com.helpcentercrawl.scheduler.job
@@ -31,14 +33,13 @@ import java.util.List;
 public class Scheduling {
 
     private final SchedulerStatusManager statusManager;
-    private final CrawlerStatusManager crawlerStatusManager;
+    private final CrawlerStatusRepository crawlerStatusRepository;
     private final List<SiteCrawler> crawlers;
 
     /**
      * 3분마다 크롤링 실행 (월-금요일, 08:00 ~ 18:00 사이에만)
      */
     @Scheduled(cron = "${scheduler.crawler.cron}")
-//    @Scheduled(fixedDelay = 180000, initialDelay = 1000)
     public void runCrawlers() {
         Instant totalStart = Instant.now();
 
@@ -47,24 +48,42 @@ public class Scheduling {
             return;
         }
 
-        log.info("크롤링 시작: {} 개 사이트", crawlers.size());
+        List<CrawlerStatus> statuses = crawlerStatusRepository.findAll();
+
+        log.info("크롤링 시작: {} 개 사이트", statuses.size());
         int enabledCount = 0;
 
-        for (SiteCrawler crawler : crawlers) {
-            String siteCode = crawler.getSiteCode();
-            String siteName = crawler.getSiteName();
+        for (CrawlerStatus status : statuses) {
+            String siteCode = status.getSiteCode();
+            String siteName = status.getSiteName();
 
-            // 사이트별 활성화 상태 확인
-            if (!crawlerStatusManager.isSiteEnabled(siteCode)) {
+            if (!status.isEnabled()) {
                 log.info("{} 크롤러가 비활성화되어 있어 건너뜁니다.", siteName);
                 continue;
             }
 
             enabledCount++;
 
+            Optional<SiteCrawler> matchesCrawler = crawlers.stream()
+                    .filter(c -> c.getSiteCode().equals(siteCode))
+                    .findFirst();
+
+            if (matchesCrawler.isEmpty()) {
+                log.warn("{} 사이트에 대한 크롤러 구현체를 찾을 수 없습니다.", siteName);
+                continue;
+            }
+
+            SiteCrawler crawler = matchesCrawler.get();
+
+            Instant siteStart = Instant.now();
 
             try {
                 crawler.crawl();
+
+                Instant siteEnd = Instant.now();
+                Duration siteDuration = Duration.between(siteStart, siteEnd);
+                log.info("{} 크롤링 완료: {}초", siteName, siteDuration.toSeconds());
+
             } catch (Exception e) {
                 log.error("{} 크롤링 중 오류 발생: {}", siteName, e.getMessage());
                 log.error("오류 상세 정보:", e);
@@ -73,7 +92,6 @@ public class Scheduling {
 
         Instant totalEnd = Instant.now();
         Duration totalDuration = Duration.between(totalStart, totalEnd);
-
-        log.info("크롤링 작업 완료 - 활성화된 크롤러: {}/{}, 총 실행 시간: {}초", enabledCount, crawlers.size(), totalDuration.toSeconds());
+        log.info("크롤링 작업 완료 - 활성화된 크롤러: {}/{}, 총 실행 시간: {}초", enabledCount, statuses.size(), totalDuration.toSeconds());
     }
 }

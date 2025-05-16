@@ -1,7 +1,5 @@
 package com.helpcentercrawl.status.service;
 
-import com.helpcentercrawl.crawler.interfaces.SiteCrawler;
-import com.helpcentercrawl.status.config.CrawlerStatusManager;
 import com.helpcentercrawl.status.config.SchedulerStatusManager;
 import com.helpcentercrawl.status.dto.SchedulerStatusRequest;
 import com.helpcentercrawl.status.dto.SchedulerStatusResponse;
@@ -12,6 +10,7 @@ import com.helpcentercrawl.status.repository.CrawlerStatusRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -25,8 +24,6 @@ import java.util.List;
 public class SchedulerService {
 
     private final SchedulerStatusManager statusManager;
-    private final CrawlerStatusManager crawlerStatusManager;
-    private final List<SiteCrawler> crawlers;
     private final CrawlerStatusRepository crawlerStatusRepository;
 
     /**
@@ -63,19 +60,8 @@ public class SchedulerService {
      * 특정 사이트의 크롤러 상태를 조회합니다.
      */
     public SiteStatusResponse getSiteStatus(String siteCode) {
-        SiteCrawler crawler = findCrawlerBySiteCode(siteCode);
 
-        if (crawler == null) {
-            throw new IllegalArgumentException("존재하지 않는 사이트 코드입니다: " + siteCode);
-        }
-
-        boolean isEnabled = crawlerStatusManager.isSiteEnabled(siteCode);
-
-        return SiteStatusResponse.builder()
-                .siteCode(siteCode)
-                .siteName(crawler.getSiteName())
-                .enabled(isEnabled)
-                .build();
+        return SiteStatusResponse.toDto(getCrawler(siteCode));
     }
 
     /**
@@ -93,33 +79,27 @@ public class SchedulerService {
     /**
      * 특정 사이트의 크롤러 상태를 변경합니다.
      */
+    @Transactional
     public SiteStatusResponse controlSiteStatus(String siteCode, SiteStatusRequest request) {
         if (request.getEnabled() == null) {
             throw new IllegalArgumentException("활성화 상태 값은 필수입니다");
         }
 
-        SiteCrawler crawler = findCrawlerBySiteCode(siteCode);
+        CrawlerStatus crawler = getCrawler(siteCode);
 
         if (crawler == null) {
             throw new IllegalArgumentException("존재하지 않는 사이트 코드입니다: " + siteCode);
         }
 
-        boolean status = crawlerStatusManager.setSiteEnabled(siteCode, crawler.getSiteName(), request.getEnabled());
+        crawler.updateStatus(request.getEnabled());
+        log.info( "{} 크롤러 상태가 {}으로 변경되었습니다.", crawler.getSiteName(), request.getEnabled() ? "활성화" : "비활성화");
 
-        return SiteStatusResponse.builder()
-                .siteCode(siteCode)
-                .siteName(crawler.getSiteName())
-                .enabled(status)
-                .build();
+        return SiteStatusResponse.toDto(crawler);
     }
 
-    /**
-     * 사이트 코드로 크롤러를 찾는 유틸리티 메서드
-     */
-    private SiteCrawler findCrawlerBySiteCode(String siteCode) {
-        return crawlers.stream()
-                .filter(c -> c.getSiteCode().equals(siteCode))
-                .findFirst()
-                .orElse(null);
+
+    private CrawlerStatus getCrawler(String siteCode) {
+        return crawlerStatusRepository.findBySiteCode(siteCode)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사이트 코드입니다: " + siteCode));
     }
 }

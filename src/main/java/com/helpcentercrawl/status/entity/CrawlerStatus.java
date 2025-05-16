@@ -8,6 +8,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Comment;
 
+import java.time.LocalDateTime;
+
 /**
  * packageName    : com.helpcentercrawl.status.entity
  * fileName       : CrawlerStatus
@@ -42,12 +44,24 @@ public class CrawlerStatus extends BaseEntity {
     @Comment("화면 노출 순서")
     private int viewSequence;
 
+    @Comment("마지막으로 크롤링 된 시간")
+    private LocalDateTime crawledAt;
+
     @Builder
-    public CrawlerStatus(Long id, String siteCode, String siteName, boolean enabled, int viewSequence) {
+    public CrawlerStatus(Long id, String siteCode, String siteName, boolean enabled, int viewSequence, LocalDateTime crawledAt) {
         this.id = id;
         this.siteCode = siteCode;
         this.siteName = siteName;
         this.enabled = enabled;
         this.viewSequence = viewSequence;
+        this.crawledAt = crawledAt;
+    }
+
+    public void updateStatus(boolean enabled) {
+        this.enabled = enabled;
+    }
+
+    public void updateCrawledAt(LocalDateTime crawledAt) {
+        this.crawledAt = crawledAt;
     }
 }
