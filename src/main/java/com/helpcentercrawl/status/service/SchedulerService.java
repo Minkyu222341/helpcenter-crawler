@@ -7,11 +7,12 @@ import com.helpcentercrawl.status.dto.SchedulerStatusRequest;
 import com.helpcentercrawl.status.dto.SchedulerStatusResponse;
 import com.helpcentercrawl.status.dto.SiteStatusRequest;
 import com.helpcentercrawl.status.dto.SiteStatusResponse;
+import com.helpcentercrawl.status.entity.CrawlerStatus;
+import com.helpcentercrawl.status.repository.CrawlerStatusRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -26,9 +27,11 @@ public class SchedulerService {
     private final SchedulerStatusManager statusManager;
     private final CrawlerStatusManager crawlerStatusManager;
     private final List<SiteCrawler> crawlers;
+    private final CrawlerStatusRepository crawlerStatusRepository;
 
     /**
      * 현재 스케줄러의 활성화 상태를 조회합니다.
+     *
      * @return 현재 스케줄러 상태
      */
     public SchedulerStatusResponse getSchedulerStatus() {
@@ -79,22 +82,12 @@ public class SchedulerService {
      * 모든 사이트의 크롤러 상태를 조회합니다.
      */
     public List<SiteStatusResponse> getAllSitesStatus() {
-        List<SiteStatusResponse> result = new ArrayList<>();
+        List<CrawlerStatus> crawlerInfos = crawlerStatusRepository.findAll();
 
-        for (SiteCrawler crawler : crawlers) {
-            String siteCode = crawler.getSiteCode();
-            String siteName = crawler.getSiteName();
+        return crawlerInfos.stream()
+                .map(SiteStatusResponse::toDto)
+                .toList();
 
-            boolean isEnabled = crawlerStatusManager.isSiteEnabled(siteCode);
-
-            result.add(SiteStatusResponse.builder()
-                    .siteCode(siteCode)
-                    .siteName(siteName)
-                    .enabled(isEnabled)
-                    .build());
-        }
-
-        return result;
     }
 
     /**

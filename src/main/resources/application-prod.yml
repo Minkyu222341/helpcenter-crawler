@@ -5,8 +5,6 @@ server:
 scheduler:
   crawler:
     cron: 0 0/3 8-18 * * MON-FRI  # 월요일 ~ 금요일 08시 부터 18시까지 3분마다 실행
-  migration:
-    cron: "0 0 19 * * MON-FRI" # 월-금 오후 7시
 
 
 spring:
@@ -27,7 +25,7 @@ spring:
   # JPA 설정 추가
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: validate
     properties:
       hibernate:
         dialect: org.hibernate.dialect.OracleDialect

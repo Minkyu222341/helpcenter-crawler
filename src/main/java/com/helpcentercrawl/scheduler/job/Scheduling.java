@@ -37,8 +37,8 @@ public class Scheduling {
     /**
      * 3분마다 크롤링 실행 (월-금요일, 08:00 ~ 18:00 사이에만)
      */
-//    @Scheduled(cron = "${scheduler.crawler.cron}")
-    @Scheduled(fixedDelay = 180000, initialDelay = 1000)
+    @Scheduled(cron = "${scheduler.crawler.cron}")
+//    @Scheduled(fixedDelay = 180000, initialDelay = 1000)
     public void runCrawlers() {
         Instant totalStart = Instant.now();
 

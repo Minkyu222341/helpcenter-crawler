@@ -36,11 +36,9 @@ public class CrawlerStatus extends BaseEntity {
     @Comment("사이트 이름")
     private String siteName;
 
-    @Column(nullable = false)
     @Comment("활성화 상태 (true: 활성화, false: 비활성화)")
     private boolean enabled = true;
 
-    @Column(nullable = false)
     @Comment("화면 노출 순서")
     private int viewSequence;
 
