@@ -257,7 +257,7 @@ public abstract class AbstractCrawler implements SiteCrawler {
     }
 
 
-    private static String titleProcessing(String titleText) {
+    private String titleProcessing(String titleText) {
         titleText = titleText.replace("비밀글", "").trim()
                 .replace("새글", "").trim()
                 .replace("완료", "").trim()
@@ -270,7 +270,7 @@ public abstract class AbstractCrawler implements SiteCrawler {
         return titleText;
     }
 
-    private static LocalDate dateProcessing(WebElement dateCell) {
+    private LocalDate dateProcessing(WebElement dateCell) {
         String dateText = dateCell.getText().trim();
         LocalDate date = null;
 
@@ -289,12 +289,13 @@ public abstract class AbstractCrawler implements SiteCrawler {
                     date = LocalDate.of(year, month, day);
                 }
             }
-        } catch (Exception ignored) {
+        } catch (Exception e) {
+            log.warn("날짜 파싱 중 오류 발생: '{}' - {}", dateText, e.getMessage(), e);
         }
         return date;
     }
 
-    private static boolean statusProcessing(WebElement row) {
+    protected boolean statusProcessing(WebElement row) {
         boolean completed = false;
         // 이미지로 확인
         List<WebElement> imgs = row.findElements(By.tagName("img"));
@@ -317,14 +318,6 @@ public abstract class AbstractCrawler implements SiteCrawler {
                     completed = true;
                     break;
                 }
-            }
-        }
-
-        //해양대
-        if (!completed) {
-            List<WebElement> cells = row.findElements(By.tagName("td"));
-            if (cells.get(1).getText().trim().contains("완료")) {
-                completed = true;
             }
         }
 

@@ -5,9 +5,13 @@ import com.helpcentercrawl.crawler.core.AbstractCrawler;
 import com.helpcentercrawl.crawler.model.LoginModel;
 import com.helpcentercrawl.crawler.service.CrawlResultService;
 import lombok.extern.slf4j.Slf4j;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriComponentsBuilder;
+
+import java.util.List;
 
 /**
  * packageName    : com.helpcentercrawl.crawler.impl
@@ -67,11 +71,6 @@ public class KmouCrawler extends AbstractCrawler {
     }
 
     @Override
-    protected void handlePopup() {
-
-    }
-
-    @Override
     protected void navigateToTargetPage() {
         String targetUrl = UriComponentsBuilder.fromUriString(valueSettings.getKmouTargetUrl())
                 .queryParam(QUERY_PARAM_NAME, PARAM_PAGE_COUNT)
@@ -79,6 +78,30 @@ public class KmouCrawler extends AbstractCrawler {
                 .toUriString();
 
         driver.get(targetUrl);
+    }
+
+    /**
+     * 해양대학교 특정 완료 여부 체크 로직을 오버라이드
+     * @param row 체크할 행 요소
+     * @return 완료 여부 (true: 완료, false: 미완료)
+     */
+    @Override
+    protected boolean statusProcessing(WebElement row) {
+        boolean completed = super.statusProcessing(row);
+
+        if (!completed) {
+            List<WebElement> cells = row.findElements(By.tagName("td"));
+            if (cells.size() > 1 && cells.get(1).getText().trim().contains("완료")) {
+                completed = true;
+            }
+        }
+
+        return completed;
+    }
+
+    @Override
+    protected void handlePopup() {
+
     }
 
     @Override

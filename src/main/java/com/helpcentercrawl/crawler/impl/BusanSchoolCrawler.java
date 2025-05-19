@@ -35,6 +35,32 @@ public class BusanSchoolCrawler extends AbstractCrawler {
     private static final int TITLE_INDEX = 1;
     private static final int DATE_INDEX = 3;
 
+    // DOM 요소 ID 상수 추가
+    private static final String FORM_ID = "srchForm";
+    private static final String LIST_COUNT_SELECT_ID = "listCo";
+    private static final String FORM_ACTION_URL = "/help/na/ntt/selectNttList.do";
+
+    // JavaScript 스크립트 템플릿 상수 추가
+    private static final String JS_SET_LIST_COUNT_TEMPLATE =
+            "var form = document.getElementById('%s');" +
+                    "var listCoSelect = document.getElementById('%s');" +
+                    "if (listCoSelect) {" +
+                    "    listCoSelect.disabled = true;" +
+                    "}" +
+                    "var existingInput = form.querySelector('input[name=\"%s\"]');" +
+                    "if (existingInput) {" +
+                    "    form.removeChild(existingInput);" +
+                    "}" +
+                    "var input = document.createElement('input');" +
+                    "input.type = 'hidden';" +
+                    "input.name = '%s';" +
+                    "input.value = '%s';" +
+                    "form.appendChild(input);";
+
+    private static final String JS_SUBMIT_FORM_TEMPLATE =
+            "document.getElementById('%s').action = '%s'; " +
+                    "document.getElementById('%s').submit();";
+
     public BusanSchoolCrawler(CrawlResultService crawlResultService, CrawlerValueSettings valueSettings) {
         super(crawlResultService, valueSettings);
     }
@@ -84,27 +110,27 @@ public class BusanSchoolCrawler extends AbstractCrawler {
         try {
             JavascriptExecutor js = (JavascriptExecutor) driver;
 
-            String script =
-                    "var form = document.getElementById('srchForm');" +
-                            "var listCoSelect = document.getElementById('listCo');" +
-                            "if (listCoSelect) {" +
-                            "    listCoSelect.disabled = true;" +
-                            "}" +
-                            "var existingInput = form.querySelector('input[name=\"listCo\"]');" +
-                            "if (existingInput) {" +
-                            "    form.removeChild(existingInput);" +
-                            "}" +
-                            "var input = document.createElement('input');" +
-                            "input.type = 'hidden';" +
-                            "input.name = 'listCo';" +
-                            "input.value = '" + PARAM_PAGE_COUNT + "';" +
-                            "form.appendChild(input);";
+            // 리스트 개수 설정 스크립트 생성
+            String setListCountScript = String.format(
+                    JS_SET_LIST_COUNT_TEMPLATE,
+                    FORM_ID,
+                    LIST_COUNT_SELECT_ID,
+                    LIST_COUNT_SELECT_ID,
+                    LIST_COUNT_SELECT_ID,
+                    PARAM_PAGE_COUNT
+            );
 
-            js.executeScript(script);
+            js.executeScript(setListCountScript);
 
-            // 폼 제출
-            js.executeScript("document.getElementById('srchForm').action = '/help/na/ntt/selectNttList.do'; " +
-                    "document.getElementById('srchForm').submit();");
+            // 폼 제출 스크립트 생성
+            String submitFormScript = String.format(
+                    JS_SUBMIT_FORM_TEMPLATE,
+                    FORM_ID,
+                    FORM_ACTION_URL,
+                    FORM_ID
+            );
+
+            js.executeScript(submitFormScript);
 
             wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector(TABLE_SELECTOR)));
 
@@ -153,5 +179,4 @@ public class BusanSchoolCrawler extends AbstractCrawler {
     public String getSiteCode() {
         return valueSettings.getBusanSchoolCode();
     }
-
 }

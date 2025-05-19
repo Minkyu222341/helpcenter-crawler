@@ -93,17 +93,23 @@ public class Scheduling {
             enabledCount++;
 
             Instant siteStart = Instant.now();
+            boolean success = false;
 
             try {
                 crawler.crawl();
-
-                Instant siteEnd = Instant.now();
-                Duration siteDuration = Duration.between(siteStart, siteEnd);
-                log.info("{} 크롤링 완료: {}초", siteName, siteDuration.toSeconds());
-
+                success = true;
             } catch (Exception e) {
                 log.error("{} 크롤링 중 오류 발생: {}", siteName, e.getMessage());
                 log.error("오류 상세 정보:", e);
+            } finally {
+                Instant siteEnd = Instant.now();
+                Duration siteDuration = Duration.between(siteStart, siteEnd);
+
+                if (success) {
+                    log.info("{} 크롤링 완료: {}초", siteName, siteDuration.toSeconds());
+                } else {
+                    log.info("{} 크롤링 실패 (처리 시간: {}초)", siteName, siteDuration.toSeconds());
+                }
             }
         }
 
