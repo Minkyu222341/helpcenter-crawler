@@ -4,6 +4,7 @@ import com.helpcentercrawl.crawler.interfaces.SiteCrawler;
 import com.helpcentercrawl.status.config.SchedulerStatusManager;
 import com.helpcentercrawl.status.entity.CrawlerStatus;
 import com.helpcentercrawl.status.repository.CrawlerStatusRepository;
+import com.helpcentercrawl.status.service.SchedulerService;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Component;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,6 +38,7 @@ import java.util.Map;
 public class Scheduling {
 
     private final SchedulerStatusManager statusManager;
+    private final SchedulerService schedulerService;
     private final CrawlerStatusRepository crawlerStatusRepository;
     private final List<SiteCrawler> crawlers;
 
@@ -70,6 +73,7 @@ public class Scheduling {
         }
 
         List<CrawlerStatus> statuses = crawlerStatusRepository.findAll();
+        List<String> successfulSiteCodes = new ArrayList<>(); // 성공한 사이트 코드 모음
 
         log.info("크롤링 시작: {} 개 사이트", statuses.size());
         int enabledCount = 0;
@@ -107,10 +111,15 @@ public class Scheduling {
 
                 if (success) {
                     log.info("{} 크롤링 완료: {}초", siteName, siteDuration.toSeconds());
+                    successfulSiteCodes.add(siteCode); // 성공한 사이트 코드 추가
                 } else {
                     log.info("{} 크롤링 실패 (처리 시간: {}초)", siteName, siteDuration.toSeconds());
                 }
             }
+        }
+
+        if (!successfulSiteCodes.isEmpty()) {
+            schedulerService.updateCrawledAtBatch(successfulSiteCodes);
         }
 
         Instant totalEnd = Instant.now();

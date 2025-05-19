@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -25,6 +26,22 @@ public class SchedulerService {
 
     private final SchedulerStatusManager statusManager;
     private final CrawlerStatusRepository crawlerStatusRepository;
+
+
+    /**
+     * 여러 크롤러의 마지막 크롤링 시간을 한 번에 업데이트합니다.
+     *
+     * @param siteCodes 사이트 코드 목록
+     */
+    @Transactional
+    public void updateCrawledAtBatch(List<String> siteCodes) {
+        List<CrawlerStatus> statuses = crawlerStatusRepository.findBySiteCodeIn(siteCodes);
+        LocalDateTime now = LocalDateTime.now();
+
+        for (CrawlerStatus status : statuses) {
+            status.updateCrawledAt(now);
+        }
+    }
 
     /**
      * 현재 스케줄러의 활성화 상태를 조회합니다.

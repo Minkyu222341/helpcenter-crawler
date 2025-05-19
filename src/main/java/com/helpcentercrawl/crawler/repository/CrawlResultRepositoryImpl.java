@@ -47,7 +47,7 @@ public class CrawlResultRepositoryImpl implements CrawlResultRepositoryCustom {
                                 .otherwise(0L).sum().intValue(),
                         crawlResult.id.count().intValue(),
                         crawlerStatus.viewSequence,
-                        crawlResult.createdAt.max()))
+                        crawlerStatus.crawledAt))
                 .from(crawlerStatus)
                 .innerJoin(crawlResult).on(crawlerStatus.siteCode.eq(crawlResult.siteCode))
                 .where(

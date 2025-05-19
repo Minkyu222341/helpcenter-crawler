@@ -16,6 +16,7 @@ public class CrawlResultService {
 
     private final CrawlResultRepository crawlResultRepository;
 
+
     /**
      * 크롤링 결과 목록을 DB에 저장
      *
