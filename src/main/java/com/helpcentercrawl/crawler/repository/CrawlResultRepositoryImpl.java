@@ -49,7 +49,7 @@ public class CrawlResultRepositoryImpl implements CrawlResultRepositoryCustom {
                         crawlerStatus.viewSequence,
                         crawlResult.createdAt.max()))
                 .from(crawlerStatus)
-                .leftJoin(crawlResult).on(crawlerStatus.siteCode.eq(crawlResult.siteCode))
+                .innerJoin(crawlResult).on(crawlerStatus.siteCode.eq(crawlResult.siteCode))
                 .where(
                         startDateGoe(condition.getStartDate()),
                         endDateLoe(condition.getEndDate())

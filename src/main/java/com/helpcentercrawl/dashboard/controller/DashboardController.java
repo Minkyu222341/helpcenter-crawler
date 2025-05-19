@@ -3,6 +3,7 @@ package com.helpcentercrawl.dashboard.controller;
 import com.helpcentercrawl.dashboard.dto.DashboardResponseDto;
 import com.helpcentercrawl.dashboard.dto.DashboardSearchCondition;
 import com.helpcentercrawl.dashboard.service.DashboardService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,7 +24,7 @@ public class DashboardController {
      * @return List<DashBoardResponseDto>
      */
     @GetMapping("/dashboard")
-    public ResponseEntity<List<DashboardResponseDto>> getDashboardList(DashboardSearchCondition condition) {
+    public ResponseEntity<List<DashboardResponseDto>> getDashboardList(@Valid DashboardSearchCondition condition) {
         List<DashboardResponseDto> dashBoardList = dashboardService.getDashBoardList(condition);
 
         return ResponseEntity.ok(dashBoardList);

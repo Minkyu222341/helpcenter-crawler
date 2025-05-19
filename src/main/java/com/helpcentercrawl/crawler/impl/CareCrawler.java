@@ -7,6 +7,7 @@ import com.helpcentercrawl.crawler.service.CrawlResultService;
 import lombok.extern.slf4j.Slf4j;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.springframework.stereotype.Component;
+import org.springframework.web.util.UriComponentsBuilder;
 
 /**
  * packageName    : com.helpcentercrawl.crawler.impl
@@ -56,7 +57,12 @@ public class CareCrawler extends AbstractCrawler {
 
     @Override
     protected void navigateToTargetPage() {
-        driver.get(valueSettings.getCareTargetUrl()+PAGE_COUNT);
+        String targetUrl = UriComponentsBuilder.fromUriString(valueSettings.getCareTargetUrl())
+                .queryParam(QUERY_PARAM_NAME, PARAM_PAGE_COUNT)
+                .build()
+                .toUriString();
+
+        driver.get(targetUrl);
     }
 
     @Override

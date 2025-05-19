@@ -36,12 +36,21 @@ public class CrawlResult extends BaseEntity {
     @Column(nullable = false)
     private LocalDate requestDate;
 
+
     @Builder
-    public CrawlResult(Long id, String siteCode, String siteName, RequestStatus status, String title, LocalDate requestDate) {
+    public CrawlResult(Long id, String siteCode, RequestStatus status, String title, LocalDate requestDate) {
         this.id = id;
         this.siteCode = siteCode;
         this.status = status;
         this.title = title;
         this.requestDate = requestDate;
+    }
+
+    public boolean updateStatus(RequestStatus status) {
+        if (!this.status.equals(status)) {
+            this.status = status;
+            return true;
+        }
+        return false;
     }
 }

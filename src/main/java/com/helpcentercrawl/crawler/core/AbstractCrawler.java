@@ -20,7 +20,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -36,11 +35,22 @@ public abstract class AbstractCrawler implements SiteCrawler {
     private static final String PROC_CHROME_DRIVER_PATH = "/usr/bin/chromedriver";
     private static final String SET_PROPERTY = "webdriver.chrome.driver";
 
-    protected String PAGE_COUNT;
+    protected String QUERY_PARAM_NAME = "listCo";
+    protected String PARAM_PAGE_COUNT;
+
 
     @Override
-    public final void crawl() {
-        this.PAGE_COUNT = "&listCo=20";
+    public void crawl() {
+        performCrawl("10");
+    }
+
+    @Override
+    public void crawlAllPages() {
+        performCrawl("3000");
+    }
+
+    private void performCrawl(String pageCount) {
+        this.PARAM_PAGE_COUNT = pageCount;
         crawledRequests.clear();
 
         if (System.getProperty("os.name").toLowerCase().contains("win")) {
@@ -67,40 +77,6 @@ public abstract class AbstractCrawler implements SiteCrawler {
 
         } catch (Exception e) {
             log.error("크롤링 오류: {}", e.getMessage(), e);
-        } finally {
-            cleanup();
-        }
-    }
-
-    @Override
-    public void crawlAllPages() {
-        this.PAGE_COUNT = "&listCo=3000";
-        crawledRequests.clear();
-
-        if (System.getProperty("os.name").toLowerCase().contains("win")) {
-            System.setProperty(SET_PROPERTY, LOCAL_CHROME_DRIVER_PATH);
-        } else {
-            System.setProperty(SET_PROPERTY, PROC_CHROME_DRIVER_PATH);
-        }
-
-        try {
-            // 1. 웹드라이버 초기화
-            initializeWebDriver();
-
-            // 2. 로그인 처리
-            login();
-
-            // 3. 대상 페이지로 이동
-            navigateToTargetPage();
-
-            // 4. 여러 페이지 데이터 처리
-            processMultiplePages();
-
-            // 5. DB에 크롤링 결과 저장
-            saveData();
-
-        } catch (Exception e) {
-            log.error("페이징 크롤링 오류: {}", e.getMessage(), e);
         } finally {
             cleanup();
         }
@@ -359,7 +335,6 @@ public abstract class AbstractCrawler implements SiteCrawler {
         if (!titleText.isEmpty() && date != null) {
             CrawlResult result = CrawlResult.builder()
                     .siteCode(getSiteCode())
-                    .siteName(getSiteName())
                     .status(completed ? RequestStatus.SUCCESS : RequestStatus.WAIT)
                     .title(titleText)
                     .requestDate(date)
@@ -373,39 +348,11 @@ public abstract class AbstractCrawler implements SiteCrawler {
      */
     protected void saveData() {
         try {
-            if (crawledRequests.isEmpty()) {
-                log.info("{} - 저장할 크롤링 결과가 없습니다.", getSiteName());
-                return;
-            }
-
-            List<CrawlResult> existingData = crawlResultService.findExistingResults(getSiteCode());
-
-            List<CrawlResult> newData = crawledRequests.stream()
-                    .filter(newResult -> !isDuplicate(newResult, existingData))
-                    .collect(Collectors.toList());
-
-            if (newData.isEmpty()) {
-                log.info("{} - 모든 데이터가 이미 존재합니다.", getSiteName());
-                return;
-            }
-
-            List<CrawlResult> savedResults = crawlResultService.saveCrawlResults(newData);
-            log.info("{} - DB에 새로운 크롤링 결과 {}건이 저장되었습니다.", getSiteName(), savedResults.size());
+            // 서비스 계층으로 로직을 위임
+            crawlResultService.processCrawlResults(crawledRequests, getSiteCode(), getSiteName());
         } catch (Exception e) {
             log.error("{} - DB 저장 중 오류 발생: {}", getSiteName(), e.getMessage());
         }
-    }
-
-    /**
-     * 중복 여부 확인 메서드
-     */
-    private boolean isDuplicate(CrawlResult newResult, List<CrawlResult> existingResults) {
-        return existingResults.stream()
-                .anyMatch(existing ->
-                        existing.getSiteCode().equals(newResult.getSiteCode()) &&
-                                existing.getTitle().equals(newResult.getTitle()) &&
-                                existing.getRequestDate().equals(newResult.getRequestDate())
-                );
     }
 
     protected void cleanup() {

@@ -24,8 +24,6 @@ public class SiteStatusResponse {
     private String siteName;
     private boolean enabled;
     private int sequence;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
     private LocalDateTime lastCrawledAt;
 
 

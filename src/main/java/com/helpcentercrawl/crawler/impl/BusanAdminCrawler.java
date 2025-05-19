@@ -9,6 +9,7 @@ import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.stereotype.Component;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.time.Duration;
 
@@ -70,7 +71,12 @@ public class BusanAdminCrawler extends AbstractCrawler {
 
     @Override
     protected void navigateToTargetPage() {
-        driver.get(valueSettings.getBusanAdminTargetUrl()+PAGE_COUNT);
+        String targetUrl = UriComponentsBuilder.fromUriString(valueSettings.getBusanAdminTargetUrl())
+                .queryParam(QUERY_PARAM_NAME, PARAM_PAGE_COUNT)
+                .build()
+                .toUriString();
+
+        driver.get(targetUrl);
     }
 
     @Override

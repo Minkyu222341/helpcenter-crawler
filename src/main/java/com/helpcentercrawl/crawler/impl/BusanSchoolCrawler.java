@@ -82,8 +82,6 @@ public class BusanSchoolCrawler extends AbstractCrawler {
      */
     private void setCustomListCount() {
         try {
-            String countValue = PAGE_COUNT.replace("&listCo=", "");
-
             JavascriptExecutor js = (JavascriptExecutor) driver;
 
             String script =
@@ -99,7 +97,7 @@ public class BusanSchoolCrawler extends AbstractCrawler {
                             "var input = document.createElement('input');" +
                             "input.type = 'hidden';" +
                             "input.name = 'listCo';" +
-                            "input.value = '" + countValue + "';" +
+                            "input.value = '" + PARAM_PAGE_COUNT + "';" +
                             "form.appendChild(input);";
 
             js.executeScript(script);

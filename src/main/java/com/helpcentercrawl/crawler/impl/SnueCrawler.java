@@ -10,6 +10,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.stereotype.Component;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.time.Duration;
 
@@ -78,7 +79,12 @@ public class SnueCrawler extends AbstractCrawler {
     protected void navigateToTargetPage() throws InterruptedException {
         Thread.sleep(1000);
 
-        driver.get(valueSettings.getSnueTargetUrl()+PAGE_COUNT);
+        String targetUrl = UriComponentsBuilder.fromUriString(valueSettings.getSnueTargetUrl())
+                .queryParam(QUERY_PARAM_NAME, PARAM_PAGE_COUNT)
+                .build()
+                .toUriString();
+
+        driver.get(targetUrl);
     }
 
     @Override

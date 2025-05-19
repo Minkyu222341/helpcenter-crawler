@@ -10,6 +10,7 @@ import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.stereotype.Component;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.time.Duration;
 
@@ -69,7 +70,12 @@ public class GnuCrawler extends AbstractCrawler {
 
     @Override
     protected void navigateToTargetPage() {
-        driver.get(valueSettings.getGnuMainTargetUrl()+PAGE_COUNT);
+        String targetUrl = UriComponentsBuilder.fromUriString(valueSettings.getGnuMainTargetUrl())
+                .queryParam(QUERY_PARAM_NAME, PARAM_PAGE_COUNT)
+                .build()
+                .toUriString();
+
+        driver.get(targetUrl);
 
         try {
             wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector(TABLE_SELECTOR)));
@@ -79,13 +85,20 @@ public class GnuCrawler extends AbstractCrawler {
     }
 
     /**
-     * 다중 URL 크롤링을 위해 processData 메서드 오버라이드
+     * 다중 URL 크롤링을 위해 processMultiplePages 메서드 오버라이드
      */
     @Override
     protected void processMultiplePages() {
+        log.info("{} - 메인 사이트 크롤링 시작", getSiteName());
         super.processMultiplePages();
 
-        driver.get(valueSettings.getGnuSubTargetUrl() + PAGE_COUNT);
+        log.info("{} - 서브 사이트 크롤링 시작", getSiteName());
+        String targetUrl = UriComponentsBuilder.fromUriString(valueSettings.getGnuSubTargetUrl())
+                .queryParam(QUERY_PARAM_NAME, PARAM_PAGE_COUNT)
+                .build()
+                .toUriString();
+
+        driver.get(targetUrl);
 
         try {
             wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector(TABLE_SELECTOR)));
