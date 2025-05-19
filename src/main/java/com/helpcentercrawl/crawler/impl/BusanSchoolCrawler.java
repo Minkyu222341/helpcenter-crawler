@@ -110,6 +110,11 @@ public class BusanSchoolCrawler extends AbstractCrawler {
         try {
             JavascriptExecutor js = (JavascriptExecutor) driver;
 
+            if (PARAM_PAGE_COUNT == null) {
+                log.warn("{} - PARAM_PAGE_COUNT가 설정되지 않아 기본값 20으로 설정합니다.", getSiteName());
+                PARAM_PAGE_COUNT = "20";
+            }
+
             // 리스트 개수 설정 스크립트 생성
             String setListCountScript = String.format(
                     JS_SET_LIST_COUNT_TEMPLATE,
