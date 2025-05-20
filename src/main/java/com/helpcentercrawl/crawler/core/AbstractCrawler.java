@@ -341,7 +341,6 @@ public abstract class AbstractCrawler implements SiteCrawler {
      */
     protected void saveData() {
         try {
-            // 서비스 계층으로 로직을 위임
             crawlResultService.processCrawlResults(crawledRequests, getSiteCode(), getSiteName());
         } catch (Exception e) {
             log.error("{} - DB 저장 중 오류 발생: {}", getSiteName(), e.getMessage());

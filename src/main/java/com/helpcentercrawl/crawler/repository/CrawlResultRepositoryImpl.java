@@ -54,7 +54,7 @@ public class CrawlResultRepositoryImpl implements CrawlResultRepositoryCustom {
                         startDateGoe(condition.getStartDate()),
                         endDateLoe(condition.getEndDate())
                 )
-                .groupBy(crawlerStatus.siteCode, crawlerStatus.siteName, crawlerStatus.viewSequence)
+                .groupBy(crawlerStatus.siteCode, crawlerStatus.siteName, crawlerStatus.viewSequence,crawlerStatus.crawledAt)
                 .orderBy(crawlerStatus.viewSequence.asc())
                 .fetch();
     }

@@ -58,7 +58,7 @@ public class GneCrawler extends AbstractCrawler {
     @Override
     protected void handlePopup() throws InterruptedException {
         try {
-            WebDriverWait alertWait = new WebDriverWait(driver, Duration.ofSeconds(3));
+            WebDriverWait alertWait = new WebDriverWait(driver, Duration.ofSeconds(10));
             Alert alert = alertWait.until(ExpectedConditions.alertIsPresent());
             String alertText = alert.getText();
 
