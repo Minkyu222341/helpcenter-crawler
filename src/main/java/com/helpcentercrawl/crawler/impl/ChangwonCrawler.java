@@ -5,31 +5,21 @@ import com.helpcentercrawl.crawler.core.AbstractCrawler;
 import com.helpcentercrawl.crawler.model.LoginModel;
 import com.helpcentercrawl.crawler.service.CrawlResultService;
 import lombok.extern.slf4j.Slf4j;
-import org.openqa.selenium.By;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.springframework.stereotype.Component;
-
-/**
- * packageName    : com.helpcentercrawl.crawler.impl
- * fileName       : ChangwonCrawler
- * author         : MinKyu Park
- * date           : 25. 4. 22.
- * description    : 창원대 지원센터 크롤러
- * ===========================================================
- * DATE              AUTHOR             NOTE
- * -----------------------------------------------------------
- * 25. 4. 22.        MinKyu Park       최초 생성
- */
+import org.springframework.web.util.UriComponentsBuilder;
 
 @Slf4j
 @Component
 public class ChangwonCrawler extends AbstractCrawler {
 
+    private static final String TABLE_SELECTOR = "table#nttTable > tbody > tr";
+    private static final int TITLE_INDEX = 1;
+    private static final int DATE_INDEX = 3;
 
     public ChangwonCrawler(CrawlResultService crawlResultService, CrawlerValueSettings valueSettings) {
         super(crawlResultService, valueSettings);
     }
-
 
     @Override
     protected void accessUrl() {
@@ -51,20 +41,32 @@ public class ChangwonCrawler extends AbstractCrawler {
 
     @Override
     protected void handlePopup() {
+        // 팝업 처리 없음
     }
-
 
     @Override
     protected void navigateToTargetPage() {
-        driver.get(valueSettings.getChangwonTargetUrl());
-        log.info("창원 헬프센터 접속 완료");
+        String targetUrl = UriComponentsBuilder.fromUriString(valueSettings.getChangwonTargetUrl())
+                .queryParam(QUERY_PARAM_NAME, PARAM_PAGE_COUNT)
+                .build()
+                .toUriString();
+
+        driver.get(targetUrl);
     }
 
     @Override
-    protected void processPageData() throws InterruptedException {
-        wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("table#nttTable > tbody > tr")));
+    protected String getTableSelector() {
+        return TABLE_SELECTOR;
+    }
 
-        processMultiplePages("table#nttTable > tbody > tr");
+    @Override
+    protected int getTitleIndex() {
+        return TITLE_INDEX;
+    }
+
+    @Override
+    protected int getDateIndex() {
+        return DATE_INDEX;
     }
 
     @Override
@@ -77,8 +79,4 @@ public class ChangwonCrawler extends AbstractCrawler {
         return valueSettings.getChangwonCode();
     }
 
-    @Override
-    public Integer getSequence() {
-        return 5;
-    }
 }

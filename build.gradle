@@ -21,6 +21,7 @@ configurations {
     compileOnly {
         extendsFrom annotationProcessor
     }
+    querydsl.extendsFrom compileClasspath
 }
 
 repositories {
@@ -51,17 +52,25 @@ dependencies {
     // Selenium
     implementation 'org.seleniumhq.selenium:selenium-java:latest.release'
 
-    //redis
-    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
-
     // Jackson JSR310 모듈 추가
     implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
 
     // 오라클 DB
     runtimeOnly 'com.oracle.database.jdbc:ojdbc11'
 
+    // QueryDSL 의존성 추가
+    implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
+    annotationProcessor "com.querydsl:querydsl-apt:${dependencyManagement.importedProperties['querydsl.version']}:jakarta"
+    annotationProcessor "jakarta.annotation:jakarta.annotation-api"
+    annotationProcessor "jakarta.persistence:jakarta.persistence-api"
+
+    //validation
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+
+    // Jakarta 어노테이션 API (런타임용)
+    implementation 'jakarta.annotation:jakarta.annotation-api'
 }
 
-tasks.named('test') {
-    useJUnitPlatform()
+clean {
+    delete file('src/main/generated')
 }

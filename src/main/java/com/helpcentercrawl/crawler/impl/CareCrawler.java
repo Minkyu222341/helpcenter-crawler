@@ -7,6 +7,7 @@ import com.helpcentercrawl.crawler.service.CrawlResultService;
 import lombok.extern.slf4j.Slf4j;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.springframework.stereotype.Component;
+import org.springframework.web.util.UriComponentsBuilder;
 
 /**
  * packageName    : com.helpcentercrawl.crawler.impl
@@ -22,6 +23,11 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 public class CareCrawler extends AbstractCrawler {
+
+    private static final int TITLE_INDEX = 2;
+    private static final int DATE_INDEX = 4;
+    private static final String TABLE_SELECTOR = "tbody > tr";
+
     public CareCrawler(CrawlResultService crawlResultService, CrawlerValueSettings valueSettings) {
         super(crawlResultService, valueSettings);
     }
@@ -51,13 +57,27 @@ public class CareCrawler extends AbstractCrawler {
 
     @Override
     protected void navigateToTargetPage() {
-        driver.get(valueSettings.getCareTargetUrl());
-        log.info("늘봄학교 서비스 헬프센터 접속 완료");
+        String targetUrl = UriComponentsBuilder.fromUriString(valueSettings.getCareTargetUrl())
+                .queryParam(QUERY_PARAM_NAME, PARAM_PAGE_COUNT)
+                .build()
+                .toUriString();
+
+        driver.get(targetUrl);
     }
 
     @Override
-    protected void processPageData() throws InterruptedException {
-        processMultiplePages("table > tbody > tr");
+    protected String getTableSelector() {
+        return TABLE_SELECTOR;
+    }
+
+    @Override
+    protected int getTitleIndex() {
+        return TITLE_INDEX;
+    }
+
+    @Override
+    protected int getDateIndex() {
+        return DATE_INDEX;
     }
 
     @Override
@@ -70,8 +90,4 @@ public class CareCrawler extends AbstractCrawler {
         return valueSettings.getCareCode();
     }
 
-    @Override
-    public Integer getSequence() {
-        return 9;
-    }
 }

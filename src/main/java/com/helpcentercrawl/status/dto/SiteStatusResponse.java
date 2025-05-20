@@ -1,5 +1,6 @@
 package com.helpcentercrawl.status.dto;
 
+import com.helpcentercrawl.status.entity.CrawlerStatus;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -22,7 +23,17 @@ public class SiteStatusResponse {
     private String siteCode;
     private String siteName;
     private boolean enabled;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
+    private int sequence;
+    private LocalDateTime lastCrawledAt;
 
+
+
+    public static SiteStatusResponse toDto(CrawlerStatus status) {
+        return SiteStatusResponse.builder()
+                .siteCode(status.getSiteCode())
+                .siteName(status.getSiteName())
+                .enabled(status.isEnabled())
+                .sequence(status.getViewSequence())
+                .build();
+    }
 }

@@ -11,6 +11,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.stereotype.Component;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.time.Duration;
 
@@ -28,6 +29,11 @@ import java.time.Duration;
 @Slf4j
 @Component
 public class BusanMainCrawler extends AbstractCrawler {
+
+    private static final String TABLE_SELECTOR = "table tbody tr";
+    private static final int TITLE_INDEX = 2;
+    private static final int DATE_INDEX = 4;
+
     public BusanMainCrawler(CrawlResultService crawlResultService, CrawlerValueSettings valueSettings) {
         super(crawlResultService, valueSettings);
     }
@@ -59,20 +65,33 @@ public class BusanMainCrawler extends AbstractCrawler {
             WebElement confirmButton = driver.findElement(By.cssSelector(".jconfirm-buttons .btn.btn-blue"));
             confirmButton.click();
         } catch (TimeoutException ignored) {
-
+            // 팝업이 없는 경우 무시
         }
     }
 
-
     @Override
     protected void navigateToTargetPage() {
-        driver.get(valueSettings.getBusanMainTargetUrl());
-        log.info("부산본청 헬프센터 접속 완료");
+        String targetUrl = UriComponentsBuilder.fromUriString(valueSettings.getBusanMainTargetUrl())
+                .queryParam(QUERY_PARAM_NAME, PARAM_PAGE_COUNT)
+                .build()
+                .toUriString();
+
+        driver.get(targetUrl);
     }
 
     @Override
-    protected void processPageData() {
-        processMultiplePages("table tbody tr");
+    protected String getTableSelector() {
+        return TABLE_SELECTOR;
+    }
+
+    @Override
+    protected int getTitleIndex() {
+        return TITLE_INDEX;
+    }
+
+    @Override
+    protected int getDateIndex() {
+        return DATE_INDEX;
     }
 
     @Override
@@ -85,8 +104,4 @@ public class BusanMainCrawler extends AbstractCrawler {
         return valueSettings.getBusanMainCode();
     }
 
-    @Override
-    public Integer getSequence() {
-        return 3;
-    }
 }

@@ -12,58 +12,33 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.stereotype.Component;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.time.Duration;
-
-/**
- * packageName    : com.helpcentercrawl.crawler.impl
- * fileName       : GneCrawler
- * author         : MinKyu Park
- * date           : 25. 4. 22.
- * description    : 경남행정 지원센터 크롤러
- * ===========================================================
- * DATE              AUTHOR             NOTE
- * -----------------------------------------------------------
- * 25. 4. 22.        MinKyu Park       최초 생성
- */
 
 @Slf4j
 @Component
 public class GneCrawler extends AbstractCrawler {
 
+    private static final String TABLE_SELECTOR = "table tbody tr";
+    private static final int TITLE_INDEX = 2;
+    private static final int DATE_INDEX = 5;
 
     public GneCrawler(CrawlResultService crawlResultService, CrawlerValueSettings valueSettings) {
         super(crawlResultService, valueSettings);
     }
 
-    @Override
-    public String getSiteName() {
-        return valueSettings.getGneName();
-    }
-
-    @Override
-    public String getSiteCode() {
-        return valueSettings.getGneCode();
-    }
-
-    @Override
-    public Integer getSequence() {
-        return 4;
-    }
 
     @Override
     protected void accessUrl() {
-        // 로그인 URL 직접 접근
         driver.get(valueSettings.getGneLoginUrl());
-        log.info("경남 헬프센터 접속 완료");
 
-        // 통합로그인 버튼 클릭
         try {
             WebElement loginLink = wait.until(ExpectedConditions.elementToBeClickable(
                     By.xpath("//a[@href='/sso/business.jsp' and @title='통합로그인']")));
             loginLink.click();
         } catch (Exception e) {
-            log.error("통합로그인 버튼 찾기 실패, 다음 단계로 넘어갑니다.");
+            log.error("통합로그인 버튼 찾기 실패");
         }
     }
 
@@ -83,13 +58,12 @@ public class GneCrawler extends AbstractCrawler {
     @Override
     protected void handlePopup() throws InterruptedException {
         try {
-            WebDriverWait alertWait = new WebDriverWait(driver, Duration.ofSeconds(3));
+            WebDriverWait alertWait = new WebDriverWait(driver, Duration.ofSeconds(10));
             Alert alert = alertWait.until(ExpectedConditions.alertIsPresent());
             String alertText = alert.getText();
 
-            if (alertText.contains("해당 아이디로 로그인한 이용자가 있습니다")) {
+            if (alertText.contains("로그인")) {
                 alert.accept();
-                // 명시적 대기로 변경
                 wait.until(d -> {
                     try {
                         d.getTitle();
@@ -100,17 +74,41 @@ public class GneCrawler extends AbstractCrawler {
                 });
             }
         } catch (TimeoutException ignored) {
-
         }
     }
 
     @Override
     protected void navigateToTargetPage() {
-        driver.get(valueSettings.getGneTargetUrl());
+        String targetUrl = UriComponentsBuilder.fromUriString(valueSettings.getGneTargetUrl())
+                .queryParam(QUERY_PARAM_NAME, PARAM_PAGE_COUNT)
+                .build()
+                .toUriString();
+
+        driver.get(targetUrl);
     }
 
     @Override
-    protected void processPageData() {
-        processMultiplePages("table tbody tr");
+    protected String getTableSelector() {
+        return TABLE_SELECTOR;
+    }
+
+    @Override
+    protected int getTitleIndex() {
+        return TITLE_INDEX;
+    }
+
+    @Override
+    protected int getDateIndex() {
+        return DATE_INDEX;
+    }
+
+    @Override
+    public String getSiteName() {
+        return valueSettings.getGneName();
+    }
+
+    @Override
+    public String getSiteCode() {
+        return valueSettings.getGneCode();
     }
 }
