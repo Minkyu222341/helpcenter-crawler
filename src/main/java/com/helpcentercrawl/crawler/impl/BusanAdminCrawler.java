@@ -65,20 +65,18 @@ public class BusanAdminCrawler extends AbstractCrawler {
     @Override
     protected void handlePopup() throws InterruptedException {
         try {
-            // 첫 번째 Alert 처리
-            WebDriverWait alertWait = new WebDriverWait(driver, Duration.ofSeconds(3));
-            alertWait.until(ExpectedConditions.alertIsPresent());
+            WebDriverWait firstAlertWait = new WebDriverWait(driver, Duration.ofSeconds(5));
+            firstAlertWait.until(ExpectedConditions.alertIsPresent());
 
             Alert firstAlert = driver.switchTo().alert();
             String firstAlertText = firstAlert.getText();
             log.info("부산행정 - 첫 번째 Alert: {}", firstAlertText);
             firstAlert.accept();
 
-            Thread.sleep(500); // 잠시 대기
-
-            // 두 번째 Alert 처리
             try {
-                alertWait.until(ExpectedConditions.alertIsPresent());
+                WebDriverWait secondAlertWait = new WebDriverWait(driver, Duration.ofSeconds(2));
+                secondAlertWait.until(ExpectedConditions.alertIsPresent());
+
                 Alert secondAlert = driver.switchTo().alert();
                 String secondAlertText = secondAlert.getText();
                 log.info("부산행정 - 두 번째 Alert: {}", secondAlertText);
@@ -91,7 +89,7 @@ public class BusanAdminCrawler extends AbstractCrawler {
             }
 
         } catch (TimeoutException e) {
-            log.debug("부산행정 - Alert 창이 나타나지 않았습니다.");
+            log.debug("부산행정 - 첫 번째 Alert 창이 나타나지 않았습니다.");
         } catch (NoAlertPresentException e) {
             log.debug("부산행정 - Alert이 존재하지 않습니다.");
         }
