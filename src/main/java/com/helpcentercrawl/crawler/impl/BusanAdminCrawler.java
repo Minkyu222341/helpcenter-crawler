@@ -5,6 +5,8 @@ import com.helpcentercrawl.crawler.core.AbstractCrawler;
 import com.helpcentercrawl.crawler.model.LoginModel;
 import com.helpcentercrawl.crawler.service.CrawlResultService;
 import lombok.extern.slf4j.Slf4j;
+import org.openqa.selenium.Alert;
+import org.openqa.selenium.NoAlertPresentException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -48,7 +50,10 @@ public class BusanAdminCrawler extends AbstractCrawler {
                 .username(valueSettings.getBusanAdminUsername())
                 .password(valueSettings.getBusanAdminPassword())
                 .jsLogin(false)
-                .successCondition(ExpectedConditions.urlContains("main"))
+                .successCondition(ExpectedConditions.or(
+                        ExpectedConditions.urlContains("main"),
+                        ExpectedConditions.urlContains("changePassword")
+                ))
                 .build();
     }
 
@@ -58,14 +63,35 @@ public class BusanAdminCrawler extends AbstractCrawler {
     }
 
     @Override
-    protected void handlePopup() {
+    protected void handlePopup() throws InterruptedException {
         try {
-            WebDriverWait alertWait = new WebDriverWait(driver, Duration.ofSeconds(3));
-            alertWait.until(ExpectedConditions.alertIsPresent());
+            WebDriverWait firstAlertWait = new WebDriverWait(driver, Duration.ofSeconds(5));
+            firstAlertWait.until(ExpectedConditions.alertIsPresent());
 
-            driver.switchTo().alert().accept();
-        } catch (TimeoutException ignored) {
-            log.debug("Alert 창이 나타나지 않았습니다.");
+            Alert firstAlert = driver.switchTo().alert();
+            String firstAlertText = firstAlert.getText();
+            log.info("부산행정 - 첫 번째 Alert: {}", firstAlertText);
+            firstAlert.accept();
+
+            try {
+                WebDriverWait secondAlertWait = new WebDriverWait(driver, Duration.ofSeconds(2));
+                secondAlertWait.until(ExpectedConditions.alertIsPresent());
+
+                Alert secondAlert = driver.switchTo().alert();
+                String secondAlertText = secondAlert.getText();
+                log.info("부산행정 - 두 번째 Alert: {}", secondAlertText);
+                secondAlert.accept();
+
+                log.info("부산행정 - 두 개의 Alert 처리 완료");
+
+            } catch (TimeoutException e) {
+                log.debug("부산행정 - 두 번째 Alert이 나타나지 않았습니다.");
+            }
+
+        } catch (TimeoutException e) {
+            log.debug("부산행정 - 첫 번째 Alert 창이 나타나지 않았습니다.");
+        } catch (NoAlertPresentException e) {
+            log.debug("부산행정 - Alert이 존재하지 않습니다.");
         }
     }
 
