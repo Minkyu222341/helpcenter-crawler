@@ -193,6 +193,9 @@ public abstract class AbstractCrawler implements SiteCrawler {
      */
     protected void processData() {
         try {
+            // 데이터 처리 시작 전 Alert 확인
+            handleUnexpectedAlert();
+
             String tableSelector = getTableSelector();
             List<WebElement> rows = driver.findElements(By.cssSelector(tableSelector));
 
@@ -201,8 +204,6 @@ public abstract class AbstractCrawler implements SiteCrawler {
                     List<WebElement> cells = row.findElements(By.tagName("td"));
 
                     if (cells.size() > Math.max(getTitleIndex(), getDateIndex())) {
-
-
                         if (isNotice(cells.get(0))) {
                             continue;
                         }
@@ -219,20 +220,37 @@ public abstract class AbstractCrawler implements SiteCrawler {
                         }
 
                         titleText = titleProcessing(titleText);
-
                         LocalDate date = dateProcessing(dateCell);
-
                         boolean completed = statusProcessing(row);
 
                         saveDataBuild(titleText, date, completed);
                     }
+                } catch (UnhandledAlertException e) {
+                    log.warn("{} - 행 처리 중 Alert 발생, 해당 행 건너뜀: {}", getSiteName(), e.getAlertText());
+                    handleUnexpectedAlert();
                 } catch (Exception e) {
                     log.warn("{} - 행 데이터 처리 중 오류 발생: {}", getSiteName(), e.getMessage());
                 }
             }
 
+        } catch (UnhandledAlertException e) {
+            log.warn("{} - 데이터 처리 중 Alert으로 인한 중단: {}", getSiteName(), e.getAlertText());
+            handleUnexpectedAlert();
         } catch (Exception e) {
             log.error("데이터 처리 오류: {}", e.getMessage());
+        }
+    }
+
+    private void handleUnexpectedAlert() {
+        try {
+            Alert alert = driver.switchTo().alert();
+            String alertText = alert.getText();
+            log.info("{} - 예상치 못한 Alert 처리: {}", getSiteName(), alertText);
+            alert.accept();
+        } catch (NoAlertPresentException e) {
+            // Alert이 없으면 무시
+        } catch (Exception e) {
+            log.warn("{} - Alert 처리 중 오류: {}", getSiteName(), e.getMessage());
         }
     }
 
