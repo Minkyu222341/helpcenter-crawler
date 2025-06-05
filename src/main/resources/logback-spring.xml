@@ -27,7 +27,7 @@
         <keepAliveDuration>5 minutes</keepAliveDuration>
         <writeTimeout>5000</writeTimeout>
         <includeCallerData>false</includeCallerData>
-        <queueSize>256</queueSize>
+        <queueSize>100</queueSize>
     </appender>
 
     <!-- B 컴퓨터로만 전송, A 컴퓨터에는 아무것도 저장 안 함 -->
