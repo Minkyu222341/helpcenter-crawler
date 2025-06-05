@@ -4,7 +4,7 @@ server:
 # 크롤링 실행 주기 설정 (ms 단위)
 scheduler:
   crawler:
-    cron: 0 0/3 8-18 * * MON-FRI  # 월요일 ~ 금요일 08시 부터 18시까지 3분마다 실행
+    cron: 0 0/10 8-18 * * MON-FRI  # 월요일 ~ 금요일 08시 부터 18시까지 10분마다 실행
 
 
 spring:

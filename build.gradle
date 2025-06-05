@@ -69,6 +69,9 @@ dependencies {
 
     // Jakarta 어노테이션 API (런타임용)
     implementation 'jakarta.annotation:jakarta.annotation-api'
+
+    //ELK
+    implementation 'net.logstash.logback:logstash-logback-encoder:7.4'
 }
 
 clean {
