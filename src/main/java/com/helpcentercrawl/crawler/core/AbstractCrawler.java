@@ -82,40 +82,6 @@ public abstract class AbstractCrawler implements SiteCrawler {
         }
     }
 
-    protected void processMultiplePages() {
-        processData();
-
-        // 2페이지부터 시작 5페이지까지 크롤링
-        for (int currentPage = 2; currentPage <= 5; currentPage++) {
-            try {
-                // 페이지 링크 존재 확인
-                String pageXpath = "//a[text()='" + currentPage + "']";
-                List<WebElement> pageLinks = driver.findElements(By.xpath(pageXpath));
-
-                if (pageLinks.isEmpty()) {
-                    log.info("{} - {}페이지 링크가 존재하지 않아 크롤링 종료", getSiteName(), currentPage);
-                    break;
-                }
-
-                // 페이지 링크 클릭
-                pageLinks.get(0).click();
-
-                // 테이블 로딩 대기
-                wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector(getTableSelector())));
-
-                Thread.sleep(1000);
-
-                // 데이터 처리
-                processData();
-
-                Thread.sleep(1000);
-            } catch (Exception e) {
-                log.info("{} - {}다음 페이지가 존재하지않아 크롤링 종료: {}", getSiteName(), currentPage, e.getMessage());
-                break;
-            }
-        }
-    }
-
     protected void initializeWebDriver() {
         ChromeOptions options = getChromeOptions();
 
@@ -188,6 +154,40 @@ public abstract class AbstractCrawler implements SiteCrawler {
         wait.until(loginModel.getSuccessCondition());
     }
 
+    protected void processMultiplePages() {
+        processData();
+
+        // 2페이지부터 시작 5페이지까지 크롤링
+        for (int currentPage = 2; currentPage <= 5; currentPage++) {
+            try {
+                // 페이지 링크 존재 확인
+                String pageXpath = "//a[text()='" + currentPage + "']";
+                List<WebElement> pageLinks = driver.findElements(By.xpath(pageXpath));
+
+                if (pageLinks.isEmpty()) {
+                    log.info("{} - {}페이지 링크가 존재하지 않아 크롤링 종료", getSiteName(), currentPage);
+                    break;
+                }
+
+                // 페이지 링크 클릭
+                pageLinks.get(0).click();
+
+                // 테이블 로딩 대기
+                wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector(getTableSelector())));
+
+                Thread.sleep(1000);
+
+                // 데이터 처리
+                processData();
+
+                Thread.sleep(1000);
+            } catch (Exception e) {
+                log.info("{} - {}다음 페이지가 존재하지않아 크롤링 종료: {}", getSiteName(), currentPage, e.getMessage());
+                break;
+            }
+        }
+    }
+
     /**
      * 크롤링
      */
@@ -237,7 +237,7 @@ public abstract class AbstractCrawler implements SiteCrawler {
             log.warn("{} - 데이터 처리 중 Alert으로 인한 중단: {}", getSiteName(), e.getAlertText());
             handleUnexpectedAlert();
         } catch (Exception e) {
-            log.error("데이터 처리 오류: {}", e.getMessage());
+            log.error("데이터 처리 오류: {}, 사이트: {}", e.getMessage(),getSiteName());
         }
     }
 
