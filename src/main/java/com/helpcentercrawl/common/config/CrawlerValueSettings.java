@@ -141,4 +141,18 @@ public class CrawlerValueSettings {
     private String careUsername;
     @Value("${crawler.sites.care.password}")
     private String carePassword;
+
+    //전세임대포털 사이트 설정
+    @Value("${crawler.sites.jeonse.code}")
+    private String jeonseCode;
+    @Value("${crawler.sites.jeonse.name}")
+    private String jeonseName;
+    @Value("${crawler.sites.jeonse.login-url}")
+    private String jeonseLoginUrl;
+    @Value("${crawler.sites.jeonse.target-url}")
+    private String jeonseTargetUrl;
+    @Value("${crawler.sites.jeonse.username}")
+    private String jeonseUsername;
+
+
 }

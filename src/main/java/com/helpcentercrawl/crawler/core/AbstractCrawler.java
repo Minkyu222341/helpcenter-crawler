@@ -6,6 +6,7 @@ import com.helpcentercrawl.crawler.entity.enums.RequestStatus;
 import com.helpcentercrawl.crawler.interfaces.SiteCrawler;
 import com.helpcentercrawl.crawler.model.LoginModel;
 import com.helpcentercrawl.crawler.service.CrawlResultService;
+import io.github.bonigarcia.wdm.WebDriverManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.openqa.selenium.*;
@@ -31,13 +32,8 @@ public abstract class AbstractCrawler implements SiteCrawler {
     protected WebDriverWait wait;
     protected List<CrawlResult> crawledRequests = new ArrayList<>();
 
-    private static final String LOCAL_CHROME_DRIVER_PATH = "src/main/resources/chromedriver/windows/chromedriver.exe";
-    private static final String PROC_CHROME_DRIVER_PATH = "/usr/bin/chromedriver";
-    private static final String SET_PROPERTY = "webdriver.chrome.driver";
-
     protected String QUERY_PARAM_NAME = "listCo";
     protected String PARAM_PAGE_COUNT;
-
 
     @Override
     public void crawl() {
@@ -52,12 +48,6 @@ public abstract class AbstractCrawler implements SiteCrawler {
     private void performCrawl(String pageCount) {
         this.PARAM_PAGE_COUNT = pageCount;
         crawledRequests.clear();
-
-        if (System.getProperty("os.name").toLowerCase().contains("win")) {
-            System.setProperty(SET_PROPERTY, LOCAL_CHROME_DRIVER_PATH);
-        } else {
-            System.setProperty(SET_PROPERTY, PROC_CHROME_DRIVER_PATH);
-        }
 
         try {
             // 1. 웹드라이버 초기화
@@ -83,6 +73,8 @@ public abstract class AbstractCrawler implements SiteCrawler {
     }
 
     protected void initializeWebDriver() {
+        WebDriverManager.chromedriver().setup();
+
         ChromeOptions options = getChromeOptions();
 
         Map<String, Object> prefs = new HashMap<>();
@@ -92,6 +84,8 @@ public abstract class AbstractCrawler implements SiteCrawler {
 
         driver = new ChromeDriver(options);
         wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+
+        log.info("{} - WebDriverManager로 ChromeDriver 자동 설정 완료", getSiteName());
     }
 
     private ChromeOptions getChromeOptions() {
@@ -109,10 +103,12 @@ public abstract class AbstractCrawler implements SiteCrawler {
             accessUrl();
             LoginModel loginModel = getLoginModel();
 
-            if (loginModel.isJsLogin()) {
-                jsLogin(loginModel);
-            } else {
-                standardLogin(loginModel);
+            if (loginModel != null) {
+                if (loginModel.isJsLogin()) {
+                    jsLogin(loginModel);
+                } else {
+                    standardLogin(loginModel);
+                }
             }
 
             log.info("{} 로그인 성공", getSiteName());

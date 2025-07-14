@@ -62,8 +62,8 @@ public class Scheduling {
     /**
      * 3분마다 크롤링 실행 (월-금요일, 08:00 ~ 18:00 사이에만)
      */
-    @Scheduled(cron = "${scheduler.crawler.cron}")
-//    @Scheduled(initialDelay = 1000, fixedRate = 60000)
+//    @Scheduled(cron = "${scheduler.crawler.cron}")
+    @Scheduled(initialDelay = 1000, fixedRate = 60000)
     public void runCrawlers() {
         Instant totalStart = Instant.now();
 
@@ -73,6 +73,7 @@ public class Scheduling {
         }
 
         List<CrawlerStatus> statuses = crawlerStatusRepository.findAll();
+
         List<String> successfulSiteCodes = new ArrayList<>(); // 성공한 사이트 코드 모음
 
         log.info("크롤링 시작: {} 개 사이트", statuses.size());

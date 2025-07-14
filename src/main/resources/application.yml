@@ -75,3 +75,9 @@ crawler:
       target-url: https://care.pen.go.kr/help/na/ntt/selectNttList.do?mi=33070&bbsId=3707
       username: ${crawler.sites.care.username}
       password: ${crawler.sites.care.password}
+    jeonse:
+      code: ${crawler.sites.jeonse.code}
+      name: 전세임대포털
+      login-url: http://www.dev5.com/
+      target-url: https://care.pen.go.kr/help/na/ntt/selectNttList.do?mi=33070&bbsId=3707
+      username: ${crawler.sites.care.username}
